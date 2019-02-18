@@ -26,10 +26,11 @@ class TestCharacter(CharacterEntity):
         # allDirections = self.getAllDirections(wrld, start)
 
         # define depth
-        depth = 5
+        depth = 3
 
         # Find the current best move for the agent using expectimax
         bestScoreMove = self.expectimax(wrld, start, goal, depth)
+        print("Best Move: ", bestScoreMove)
 
 
         # bestScoreMove = self.scoreMoves(wrld, start, goal, allDirections)
@@ -59,7 +60,7 @@ class TestCharacter(CharacterEntity):
 
 
         # values that holds the best move and max score of all the moves
-        maxScore = 0
+        maxScore = -infinity
         bestAction = []
 
         # Loop that iterates over all possible directions and assigns a value to the direction
@@ -89,6 +90,13 @@ class TestCharacter(CharacterEntity):
         if(self.goToGoal(state, goal)):
             # Return max value to enter goal
             return infinity
+
+        # Decrement depth
+        depth = depth - 1
+        if (depth == 0):
+            # Get score of state
+            stateScore = self.scoreMove(wrld, state, goal, path)
+            return stateScore
 
         v = 0
         allDirections = self.getAllDirections(wrld, state)
@@ -146,8 +154,6 @@ class TestCharacter(CharacterEntity):
     # RETRUNS: the best move for the agent
     #
     def scoreMove(self, wrld, current, goal, originalPath):
-        # Living score
-        livingScore = abs(wrld.time)
 
         enemies = self.getEnemy(wrld)
         enemyScore = 0
@@ -160,7 +166,7 @@ class TestCharacter(CharacterEntity):
         if (current in originalPath):
             a_star_score = 5
 
-        totalScore = livingScore + a_star_score + enemyScore
+        totalScore = a_star_score + enemyScore
 
         return totalScore
 
@@ -184,7 +190,7 @@ class TestCharacter(CharacterEntity):
         a_star_move = self.get_a_star_move(wrld, start, goal)
 
         bestMove = -1
-        highestScore = -1
+        highestScore = -infinity
         for i in range(len(allDirections)):
             livingScore = abs(wrld.time)
 
