@@ -25,8 +25,11 @@ class TestCharacter(CharacterEntity):
         # Get all possible directions fro agent
         # allDirections = self.getAllDirections(wrld, start)
 
+        # define depth
+        depth = 5
+
         # Find the current best move for the agent using expectimax
-        bestScoreMove = self.expectimax(wrld, start, goal)
+        bestScoreMove = self.expectimax(wrld, start, goal, depth)
 
 
         # bestScoreMove = self.scoreMoves(wrld, start, goal, allDirections)
@@ -39,14 +42,16 @@ class TestCharacter(CharacterEntity):
 
     # Chooses the best direction to go in based on expectimax
     #
-    # PARAM: [ world, [int, int], (int, int)]: wrld: the current state of the world
+    # PARAM: [ world, [int, int], (int, int), int]: wrld: the current state of the world
     #                                          [start.x, start.y]: the x and y coordinated the agent is located at
     #                                          [goal.x, goal.y]: the x and y coordinated of the goal / exit
     #                                          allDirections: a list of all the directions the agent can go
+    #                                          depth: the defined search depth
     #
     # RETRUNS: the best move for the agent
     #
-    def expectimax(self, wrld, start, goal):
+    def expectimax(self, wrld, start, goal, depth):
+
         allDirections = self.getAllDirections(wrld, start)
         allStates = self.getAllSpaces(wrld, start)
 
@@ -57,7 +62,7 @@ class TestCharacter(CharacterEntity):
 
         # Loop that iterates over all possible directions and assigns a value to the direction
         for i in range(len(allStates)):
-            score = expectValue(wrld, allStates[i], goal)
+            score = self.expectValue(wrld, allStates[i], goal, depth)
 
             print(allStates[i], allDirections[i], score)
 
@@ -70,13 +75,14 @@ class TestCharacter(CharacterEntity):
 
     # Gets a value for an expected state
     #
-    # PARAM: [ world, (int, int)]: wrld: the current state of the world
-    #                              [start.x, start.y]: the x and y coordinated the agent is located at
-    #                              [goal.x, goal.y]: the x and y coordinated of the goal / exit
+    # PARAM: [ world, (int, int), (int, int), int]: wrld: the current state of the world
+    #                                               [start.x, start.y]: the x and y coordinated the agent is located at
+    #                                               [goal.x, goal.y]: the x and y coordinated of the goal / exit
+    #                                               depth: the current depth of the search
     #
     # RETRUNS: the best move for the agent
     #
-    def expectValue(self, wrld, state, goal):
+    def expectValue(self, wrld, state, goal, depth):
         # Terminal Test
         if(self.goToGoal(state, goal)):
             # Return max value to enter goal
@@ -89,9 +95,69 @@ class TestCharacter(CharacterEntity):
             # Get the probability of an action
             # TODO: DOES NOT ACCOUNT FOR PLACING BOMB
             probability = 1 / len(allDirections[i])
-            v = v + probability * maxValue(allStates[i])
+            v = v + probability * self.maxValue(wrld, allStates[i], goal, depth)
 
-        return v
+
+    # Gets a max value for a state
+    #
+    # PARAM: [ world, (int, int), (int, int), int]: wrld: the current state of the world
+    #                                               [start.x, start.y]: the x and y coordinated the agent is located at
+    #                                               [goal.x, goal.y]: the x and y coordinated of the goal / exit
+    #                                               depth: the current depth of the search
+    #
+    # RETRUNS: the best move for the agent
+    #
+    def maxValue(self, wrld, state, goal, depth):
+        # Terminal Test
+        if (self.goToGoal(state, goal)):
+            # Return max value to enter goal
+            return infinity
+
+        # Decrement depth
+        depth = depth - 1
+        if (depth == 0):
+            # Get score of state
+            stateScore = self.scoreMove(wrld, state, goal)
+            return stateScore
+
+
+        v = -infinity
+        allDirections = self.getAllDirections(wrld, state)
+        allStates = self.getAllSpaces(wrld, state)
+        for i in range(len(allDirections)):
+            v = max(v, self.expectValue(wrld, allStates[i], goal, depth))
+
+
+
+
+
+    # Chooses the best direction to go in based on heuristics
+    #
+    # PARAM: [ world, [int, int], (int, int)]: wrld: the current state of the world
+    #                                          [start.x, start.y]: the x and y coordinated the agent is located at
+    #                                          [goal.x, goal.y]: the x and y coordinated of the goal / exit
+    #
+    # RETRUNS: the best move for the agent
+    #
+    def scoreMove(self, wrld, current, goal, a_star_path):
+        enemies = self.getEnemy(wrld)
+
+        # Gets the move recommended by A*
+        a_star_move = self.get_a_star_move(wrld, current, goal)
+
+        enemyScore = 0
+        for enemyLoc in enemies:
+            enemyDis = math.sqrt((enemyLoc[0] - current.x) ** 2 + (enemyLoc[1] - current.y) ** 2)
+            if (enemyDis < 4):
+                enemyScore = enemyScore - ((4 - enemyDis) * 3)
+
+        a_star_score = 0
+        if (a_star_move == allDirections[i]):
+            a_star_score = 5
+
+        totalScore = livingScore + a_star_score + enemyScore
+
+        return totalScore
 
 
 
