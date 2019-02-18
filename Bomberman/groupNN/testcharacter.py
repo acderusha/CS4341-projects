@@ -8,6 +8,8 @@ from colorama import Fore, Back
 from queue import PriorityQueue
 import math
 
+infinity = 1000000
+
 class TestCharacter(CharacterEntity):
 
     def do(self, wrld):
@@ -46,14 +48,52 @@ class TestCharacter(CharacterEntity):
     #
     def expectimax(self, wrld, start, goal):
         allDirections = self.getAllDirections(wrld, start)
+        allStates = self.getAllSpaces(wrld, start)
 
-        # Array that holds the value corresponding to a given move
-        directionScore = []
+
+        # values that holds the best move and max score of all the moves
+        maxScore = 0
+        bestAction = []
 
         # Loop that iterates over all possible directions and assigns a value to the direction
-        for state in allDirections:
-            score = expectValue(state)
-            directionScore.append(state)
+        for i in range(len(allStates)):
+            score = expectValue(wrld, allStates[i], goal)
+
+            print(allStates[i], allDirections[i], score)
+
+            if(score > maxScore):
+                maxScore = score
+                bestAction = allDirections[i]
+
+        return bestAction
+
+
+    # Gets a value for an expected state
+    #
+    # PARAM: [ world, (int, int)]: wrld: the current state of the world
+    #                              [start.x, start.y]: the x and y coordinated the agent is located at
+    #                              [goal.x, goal.y]: the x and y coordinated of the goal / exit
+    #
+    # RETRUNS: the best move for the agent
+    #
+    def expectValue(self, wrld, state, goal):
+        # Terminal Test
+        if(self.goToGoal(state, goal)):
+            # Return max value to enter goal
+            return infinity
+
+        v = 0
+        allDirections = self.getAllDirections(wrld, state)
+        allStates = self.getAllSpaces(wrld, state)
+        for i in range(len(allDirections)):
+            # Get the probability of an action
+            # TODO: DOES NOT ACCOUNT FOR PLACING BOMB
+            probability = 1 / len(allDirections[i])
+            v = v + probability * maxValue(allStates[i])
+
+        return v
+
+
 
 
 
@@ -127,28 +167,30 @@ class TestCharacter(CharacterEntity):
     def goToGoal(self, start, goal):
         # Move Vertical Down
         if start == (goal[0], goal[1] - 1):
-            return self.move(0, 1)
+            return ((0, 1))
         # Move Vertical Up
         elif start == (goal[0], goal[1] + 1):
-            return self.move(0, -1)
+            return ((0, -1))
         # Move Horizontal Right
         elif start == (goal[0] - 1, goal[1]):
-            return self.move(1, 0)
+            return ((1, 0))
         # Move Horizontal Left
         elif start == (goal[0] + 1, goal[1]):
-            return self.move(-1, 0)
+            return ((-1, 0))
         # Move Diagonal Right-Down
         elif start == (goal[0] - 1, goal[1] - 1):
-            return self.move(1, 1)
+            return ((1, 1))
         # Move Diagonal Right-Up
         elif start == (goal[0] - 1, goal[1] + 1):
-            return self.move(1, -1)
+            return ((1, -1))
         # Move Diagonal Left-Down
         elif start == (goal[0] + 1, goal[1] - 1):
-            return self.move(-1, 1)
+            return ((-1, 1))
         # Move Diagonal Left-Up
         elif start == (goal[0] - 1, goal[1] - 1):
-            return self.move(-1, -1)
+            return ((-1, -1))
+        else:
+            return False
 
     # Finds the goal / exit to the world
     #
