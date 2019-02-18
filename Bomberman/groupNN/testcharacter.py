@@ -21,16 +21,41 @@ class TestCharacter(CharacterEntity):
         goal = self.findGoal(wrld)
 
         # Get all possible directions fro agent
-        allDirections = self.getAllDirections(wrld, start)
+        # allDirections = self.getAllDirections(wrld, start)
 
-        # Find the current best move for the agent
-        bestScoreMove = self.scoreMoves(wrld, start, goal, allDirections)
+        # Find the current best move for the agent using expectimax
+        bestScoreMove = self.expectimax(wrld, start, goal)
+
+
+        # bestScoreMove = self.scoreMoves(wrld, start, goal, allDirections)
         self.move(bestScoreMove[0], bestScoreMove[1])
 
         # Go to the goal state if the path leads to a space next to it. ie Terminal Test
         self.goToGoal(start, goal)
 
         pass
+
+    # Chooses the best direction to go in based on expectimax
+    #
+    # PARAM: [ world, [int, int], (int, int)]: wrld: the current state of the world
+    #                                          [start.x, start.y]: the x and y coordinated the agent is located at
+    #                                          [goal.x, goal.y]: the x and y coordinated of the goal / exit
+    #                                          allDirections: a list of all the directions the agent can go
+    #
+    # RETRUNS: the best move for the agent
+    #
+    def expectimax(self, wrld, start, goal):
+        allDirections = self.getAllDirections(wrld, start)
+
+        # Array that holds the value corresponding to a given move
+        directionScore = []
+
+        # Loop that iterates over all possible directions and assigns a value to the direction
+        for state in allDirections:
+            score = expectValue(state)
+            directionScore.append(state)
+
+
 
     # Chooses the best direction to go in based on heuristics
     #
