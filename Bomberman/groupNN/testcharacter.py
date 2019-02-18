@@ -51,6 +51,8 @@ class TestCharacter(CharacterEntity):
     # RETRUNS: the best move for the agent
     #
     def expectimax(self, wrld, start, goal, depth):
+        a_star_path = self.a_star_search(wrld, start, goal)
+        path = self.findPath(start, goal, wrld, a_star_path)
 
         allDirections = self.getAllDirections(wrld, start)
         allStates = self.getAllSpaces(wrld, start)
@@ -62,7 +64,7 @@ class TestCharacter(CharacterEntity):
 
         # Loop that iterates over all possible directions and assigns a value to the direction
         for i in range(len(allStates)):
-            score = self.expectValue(wrld, allStates[i], goal, depth)
+            score = self.expectValue(wrld, allStates[i], goal, depth, path)
 
             print(allStates[i], allDirections[i], score)
 
@@ -82,7 +84,7 @@ class TestCharacter(CharacterEntity):
     #
     # RETRUNS: the best move for the agent
     #
-    def expectValue(self, wrld, state, goal, depth):
+    def expectValue(self, wrld, state, goal, depth, path):
         # Terminal Test
         if(self.goToGoal(state, goal)):
             # Return max value to enter goal
@@ -95,7 +97,9 @@ class TestCharacter(CharacterEntity):
             # Get the probability of an action
             # TODO: DOES NOT ACCOUNT FOR PLACING BOMB
             probability = 1 / len(allDirections[i])
-            v = v + probability * self.maxValue(wrld, allStates[i], goal, depth)
+            v = v + probability * self.maxValue(wrld, allStates[i], goal, depth, path)
+
+        return v
 
 
     # Gets a max value for a state
@@ -107,7 +111,7 @@ class TestCharacter(CharacterEntity):
     #
     # RETRUNS: the best move for the agent
     #
-    def maxValue(self, wrld, state, goal, depth):
+    def maxValue(self, wrld, state, goal, depth, path):
         # Terminal Test
         if (self.goToGoal(state, goal)):
             # Return max value to enter goal
@@ -117,7 +121,7 @@ class TestCharacter(CharacterEntity):
         depth = depth - 1
         if (depth == 0):
             # Get score of state
-            stateScore = self.scoreMove(wrld, state, goal)
+            stateScore = self.scoreMove(wrld, state, goal, path)
             return stateScore
 
 
@@ -125,7 +129,9 @@ class TestCharacter(CharacterEntity):
         allDirections = self.getAllDirections(wrld, state)
         allStates = self.getAllSpaces(wrld, state)
         for i in range(len(allDirections)):
-            v = max(v, self.expectValue(wrld, allStates[i], goal, depth))
+            v = max(v, self.expectValue(wrld, allStates[i], goal, depth, path))
+
+        return v
 
 
 
@@ -139,20 +145,19 @@ class TestCharacter(CharacterEntity):
     #
     # RETRUNS: the best move for the agent
     #
-    def scoreMove(self, wrld, current, goal, a_star_path):
+    def scoreMove(self, wrld, current, goal, originalPath):
+        # Living score
+        livingScore = abs(wrld.time)
+
         enemies = self.getEnemy(wrld)
-
-        # Gets the move recommended by A*
-        a_star_move = self.get_a_star_move(wrld, current, goal)
-
         enemyScore = 0
         for enemyLoc in enemies:
-            enemyDis = math.sqrt((enemyLoc[0] - current.x) ** 2 + (enemyLoc[1] - current.y) ** 2)
+            enemyDis = math.sqrt((enemyLoc[0] - current[0]) ** 2 + (enemyLoc[1] - current[1]) ** 2)
             if (enemyDis < 4):
                 enemyScore = enemyScore - ((4 - enemyDis) * 3)
 
         a_star_score = 0
-        if (a_star_move == allDirections[i]):
+        if (current in originalPath):
             a_star_score = 5
 
         totalScore = livingScore + a_star_score + enemyScore
