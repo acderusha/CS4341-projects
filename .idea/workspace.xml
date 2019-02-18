@@ -16,8 +16,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Bomberman/groupNN/testcharacter.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="263">
-              <caret line="70" column="32" selection-start-line="70" selection-start-column="32" selection-end-line="70" selection-end-column="32" />
+            <state relative-caret-position="403">
+              <caret line="85" column="41" selection-start-line="85" selection-start-column="41" selection-end-line="85" selection-end-column="41" />
             </state>
           </provider>
         </entry>
@@ -72,6 +72,7 @@
       <find>getAllDirections</find>
       <find>allDirections</find>
       <find>-</find>
+      <find>goToGoal</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -202,7 +203,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="44924000" />
+    <option name="totallyTimeSpent" value="46991000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="43" width="1420" height="805" extended-state="0" />
@@ -277,8 +278,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Bomberman/groupNN/testcharacter.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="263">
-          <caret line="70" column="32" selection-start-line="70" selection-start-column="32" selection-end-line="70" selection-end-column="32" />
+        <state relative-caret-position="403">
+          <caret line="85" column="41" selection-start-line="85" selection-start-column="41" selection-end-line="85" selection-end-column="41" />
         </state>
       </provider>
     </entry>

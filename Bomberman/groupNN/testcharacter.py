@@ -25,6 +25,13 @@ class TestCharacter(CharacterEntity):
         # Get all possible directions fro agent
         # allDirections = self.getAllDirections(wrld, start)
 
+        # Terminal Test
+        finalMove = self.goToGoal(start, goal)
+        if(finalMove):
+            print("Final: ", finalMove)
+            self.move(finalMove[0], finalMove[1])
+            return
+
         # define depth
         depth = 3
 
@@ -32,12 +39,8 @@ class TestCharacter(CharacterEntity):
         bestScoreMove = self.expectimax(wrld, start, goal, depth)
         print("Best Move: ", bestScoreMove)
 
-
         # bestScoreMove = self.scoreMoves(wrld, start, goal, allDirections)
         self.move(bestScoreMove[0], bestScoreMove[1])
-
-        # Go to the goal state if the path leads to a space next to it. ie Terminal Test
-        self.goToGoal(start, goal)
 
         pass
 
@@ -64,14 +67,23 @@ class TestCharacter(CharacterEntity):
         bestAction = []
 
         # Loop that iterates over all possible directions and assigns a value to the direction
+        count = 0
         for i in range(len(allStates)):
             score = self.expectValue(wrld, allStates[i], goal, depth, path)
+
+            if(score >= infinity):
+                count = count + 1
 
             print(allStates[i], allDirections[i], score)
 
             if(score > maxScore):
                 maxScore = score
                 bestAction = allDirections[i]
+
+        if(count == len(allDirections)):
+            nextMove = path[len(path) - 2]
+            bestAction = (nextMove[0] - self.x, nextMove[1] - self.y)
+            print("A* path: ", bestAction)
 
         return bestAction
 
