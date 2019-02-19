@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4e01b8d0-896d-4053-b402-c99071288eb8" name="Default Changelist" comment="" />
+    <list default="true" id="4e01b8d0-896d-4053-b402-c99071288eb8" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -9,7 +12,17 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="68">
+              <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -33,8 +46,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/Bomberman/groupNN/scenario1/variant1.py" />
-        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/Bomberman/groupNN/testcharacter.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -54,62 +67,6 @@
             <path>
               <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
               <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
-              <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
-              <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
-              <item name="bomberman" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
-              <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
-              <item name="bomberman" type="462c0819:PsiDirectoryNode" />
-              <item name="monsters" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
-              <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
-              <item name="bomberman" type="462c0819:PsiDirectoryNode" />
-              <item name="sprites" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
-              <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
-              <item name="doc" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
-              <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
-              <item name="groupNN" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
-              <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
-              <item name="groupNN" type="462c0819:PsiDirectoryNode" />
-              <item name="scenario1" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
-              <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
-              <item name="groupNN" type="462c0819:PsiDirectoryNode" />
-              <item name="scenario2" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
-              <item name="ConnectN" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -182,6 +139,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24586913" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -243,13 +201,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -286,6 +237,13 @@
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
         </state>
       </provider>
     </entry>
