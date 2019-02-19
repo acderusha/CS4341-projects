@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4e01b8d0-896d-4053-b402-c99071288eb8" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Bomberman/groupNN/testcharacter.py" beforeDir="false" afterPath="$PROJECT_DIR$/Bomberman/groupNN/testcharacter.py" afterDir="false" />
-    </list>
+    <list default="true" id="4e01b8d0-896d-4053-b402-c99071288eb8" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -12,54 +9,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Bomberman/groupNN/testcharacter.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="155">
-              <caret line="59" column="97" selection-start-line="59" selection-start-column="97" selection-end-line="59" selection-end-column="97" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Bomberman/bomberman/world.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="206">
-              <caret line="76" column="46" selection-start-line="76" selection-start-column="11" selection-end-line="76" selection-end-column="46" />
-              <folding>
-                <element signature="e#0#20#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Bomberman/bomberman/entity.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3163">
-              <caret line="225" column="23" lean-forward="true" selection-start-line="225" selection-start-column="23" selection-end-line="225" selection-end-column="23" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Bomberman/bomberman/events.py">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Bomberman/bomberman/sensed_world.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1671">
-              <folding>
-                <element signature="e#0#20#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -98,43 +48,75 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
-              <item name="Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Project" type="462c0819:PsiDirectoryNode" />
+              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Project" type="462c0819:PsiDirectoryNode" />
+              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
               <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Project" type="462c0819:PsiDirectoryNode" />
+              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
               <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
               <item name="bomberman" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Project" type="462c0819:PsiDirectoryNode" />
+              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
+              <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
+              <item name="bomberman" type="462c0819:PsiDirectoryNode" />
+              <item name="monsters" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
+              <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
+              <item name="bomberman" type="462c0819:PsiDirectoryNode" />
+              <item name="sprites" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
+              <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
+              <item name="doc" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
               <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
               <item name="groupNN" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="Project" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Project" type="462c0819:PsiDirectoryNode" />
+              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
               <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
               <item name="groupNN" type="462c0819:PsiDirectoryNode" />
               <item name="scenario1" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
+              <item name="Bomberman" type="462c0819:PsiDirectoryNode" />
+              <item name="groupNN" type="462c0819:PsiDirectoryNode" />
+              <item name="scenario2" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Bomerman Project" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Bomerman Project" type="462c0819:PsiDirectoryNode" />
+              <item name="ConnectN" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
       <pane id="Course" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -199,10 +181,9 @@
     <option name="totallyTimeSpent" value="34312000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="43" width="1420" height="805" extended-state="0" />
-    <editor active="true" />
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24600871" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24586913" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -248,6 +229,30 @@
     <entry file="file://$PROJECT_DIR$/Bomberman/bomberman/monsters/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/Bomberman/groupNN/testcharacter.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="414">
+          <caret line="68" column="29" selection-start-line="68" selection-start-column="29" selection-end-line="68" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Bomberman/groupNN/scenario1/variant1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="17" lean-forward="true" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/Bomberman/bomberman/game.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
@@ -255,27 +260,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Bomberman/groupNN/scenario1/variant1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" column="25" lean-forward="true" selection-start-line="16" selection-start-column="25" selection-end-line="16" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="7" selection-start-line="3" selection-start-column="7" selection-end-line="3" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Bomberman/bomberman/events.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/Bomberman/bomberman/world.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="206">
-          <caret line="76" column="46" selection-start-line="76" selection-start-column="11" selection-end-line="76" selection-end-column="46" />
+        <state relative-caret-position="414">
+          <caret line="87" column="22" selection-start-line="87" selection-start-column="22" selection-end-line="87" selection-end-column="22" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>
@@ -284,24 +272,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Bomberman/bomberman/entity.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3163">
-          <caret line="225" column="23" lean-forward="true" selection-start-line="225" selection-start-column="23" selection-end-line="225" selection-end-column="23" />
+        <state relative-caret-position="414">
+          <caret line="66" column="15" selection-start-line="66" selection-start-column="8" selection-end-line="66" selection-end-column="15" />
         </state>
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Bomberman/bomberman/events.py">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/Bomberman/bomberman/sensed_world.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1671">
+        <state>
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Bomberman/groupNN/testcharacter.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="155">
-          <caret line="59" column="97" selection-start-line="59" selection-start-column="97" selection-end-line="59" selection-end-column="97" />
         </state>
       </provider>
     </entry>
