@@ -310,6 +310,9 @@ class TestCharacter(CharacterEntity):
         path.append(lastMove)
 
         while (lastMove != start):
+            if(len(path) == 1):
+                return path
+
             for next in a_star_graph[0]:
                 if(next == a_star_graph[0][lastMove]):
                     lastMove = next
@@ -327,9 +330,12 @@ class TestCharacter(CharacterEntity):
     # RETURNS: [int, int]: a_star_move: the move recommended by a*
     #
     def get_a_star_move(self, wrld, start, goal):
+        defaultMove = (0,0)
         a_star_path = self.a_star_search(wrld, start, goal)
 
         direction = self.findPath(start, goal, wrld, a_star_path)
+        if(len(direction[0]) == 0):
+            return defaultMove
 
         nextMove = direction[len(direction) - 2]
         a_star_move = (nextMove[0] - self.x, nextMove[1] - self.y)
