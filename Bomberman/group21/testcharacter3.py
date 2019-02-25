@@ -62,39 +62,45 @@ class TestCharacter(CharacterEntity):
 
         # if there are no bombs, don't worry about avoiding them
         if len(bombs) == 0:
-            # Deterermine if agent can move that direction
-            # if (a_star_move not in allDirections and len(bombs) != 1 and len(explosions) == 0):
-            #     bestMove = 'B'
-            #     return bestMove
-            if (wrld.wall_at(start[0]+a_star_move[0], start[1]+a_star_move[1]) and len(explosions) == 0):
-                bestMove = 'B'
-                return bestMove
+            enemyInRange = False
+            for enemy in enemies:
+                if (abs(enemy[0] - start[0]) <= 7 or abs(enemy[1] - start[1]) <= 7):
+                    enemyInRange = True
 
-            highestScore = -1
-            for space in allSpaces:
-                print("****************************")
-                print(space)
-                livingScore = abs(wrld.time)
+            if not enemyInRange:
+                if (wrld.wall_at(start[0]+a_star_move[0], start[1]+a_star_move[1]) and len(explosions) == 0):
+                    bestMove = 'B'
+                    return bestMove
 
-                enemyScore = 0
-                for enemyLoc in enemies:
-                    futureX = space[0]
-                    futureY = space[1]
+                highestScore = -1
+                for space in allSpaces:
+                    print("****************************")
+                    print(space)
+                    livingScore = abs(wrld.time)
 
-                    enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
-                    if (enemyDis < 4):
-                        enemyScore = enemyScore - ((4 - enemyDis) * 6)
+                    enemyScore = 0
+                    for enemyLoc in enemies:
+                        futureX = space[0]
+                        futureY = space[1]
 
-                a_star_score = 0
-                # if(a_star_move == allDirections[i]):
-                if (start[0]+a_star_move[0] == space[0]) and (start[1]+a_star_move[1] == space[1]):
-                    a_star_score = 5
+                        enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
+                        if (enemyDis < 4):
+                            enemyScore = enemyScore - ((4 - enemyDis) * 6)
 
-                totalScore = livingScore + a_star_score + enemyScore
-                print(space[0] - start[0], space[1]-start[1], totalScore)
-                if(totalScore > highestScore):
-                    highestScore = totalScore
-                    bestMove = (space[0] - start[0], space[1]-start[1])
+                    a_star_score = 0
+                    # if(a_star_move == allDirections[i]):
+                    if (start[0]+a_star_move[0] == space[0]) and (start[1]+a_star_move[1] == space[1]):
+                        a_star_score = 5
+
+                    totalScore = livingScore + a_star_score + enemyScore
+                    print(space[0] - start[0], space[1]-start[1], totalScore)
+                    if(totalScore > highestScore):
+                        highestScore = totalScore
+                        bestMove = (space[0] - start[0], space[1]-start[1])
+
+            else: # enemy is in range
+                print("EXECUTING MINIMAX")
+
 
         # if there is a bomb, ignore a* and just stay alive. also don't put another bomb down
         else:
@@ -323,7 +329,7 @@ class TestCharacter(CharacterEntity):
     # RETURNS: [int] distance: distance between the current agent location and the goal
     #
     def a_star_heuristic2(self, goal, next):
-        return math.sqrt(((goal[0] - next[0]) ** 2) + ((goal[1] - next[1]) ** 2))
+        return self.dist(next, goal)
 
     # Returns list of all the possible moves for agent (up, down, left, right, diagonal)
     #
@@ -557,3 +563,23 @@ class TestCharacter(CharacterEntity):
             y = 1
 
         return (x, y)
+
+
+    def minimax(self):
+        print()
+
+
+    def minimize(self):
+        print()
+
+
+    def maximize(self):
+        print()
+
+
+    def minimaxScore(self):
+        print()
+
+
+    def dist(self, start, goal):
+        return math.sqrt(((goal[0] - start[0]) ** 2) + ((goal[1] - start[1]) ** 2))
