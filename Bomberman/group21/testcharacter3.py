@@ -200,11 +200,18 @@ class TestCharacter(CharacterEntity):
     # RETURNS: [boolean] nextTo: specifies if an enemy is next to the agent
     #
     def isEnemeyNextTo(self, start, action, enemies):
-        nextTo = False
-        newSpot = (start[0] + action[0], start[1] + action[1])
-        for enemy in enemies:
-            if(abs(enemy[0] - newSpot[0]) <= 1 or abs(enemy[1] - newSpot[1]) <= 1):
-                nextTo = True
+        if(action != 'B'):
+            nextTo = False
+            newSpot = (start[0] + action[0], start[1] + action[1])
+            for enemy in enemies:
+                if(abs(enemy[0] - newSpot[0]) <= 1 or abs(enemy[1] - newSpot[1]) <= 1):
+                    nextTo = True
+        else:
+            nextTo = False
+            newSpot = (start[0], start[1])
+            for enemy in enemies:
+                if (abs(enemy[0] - newSpot[0]) <= 1 or abs(enemy[1] - newSpot[1]) <= 1):
+                    nextTo = True
 
         return nextTo
 
@@ -620,6 +627,8 @@ class TestCharacter(CharacterEntity):
 
         # Retrieve all possible next moves of the updated world
         allDirections = self.getAllDirections(newWrld, start)
+        # Add bomb as a possible action
+        allDirections.append('B')
 
         # If max depth is reached, then evaluate current state
         if (depth == 0):  # call heuristics and return heruistic score
@@ -641,7 +650,7 @@ class TestCharacter(CharacterEntity):
         else:
             value = -infinity
             for action in allDirections:
-                value = max(value, self.minimize(start, goal, action, wrld, depth-1, alpha, beta))
+                value = max(value, self.minimize(start, goal, action, newWrld, depth-1, alpha, beta))
                 if (value >= beta):
                     return value
                 alpha = max(alpha, value)
@@ -668,6 +677,8 @@ class TestCharacter(CharacterEntity):
 
         # Retrieve all possible next moves of the updated world
         allDirections = self.getAllDirections(newWrld, start)
+        # Add bomb as a possible action
+        allDirections.append('B')
 
         # If max depth is reached, then evaluate current state
         if (depth == 0):  # call heuristics and return heruistic score
@@ -689,8 +700,8 @@ class TestCharacter(CharacterEntity):
 
         else:
             value = infinity
-            for outcomes in boards:
-                value = min(value, self.maximize(start, goal, action, wrld, depth-1, alpha, beta))
+            for action in allDirections:
+                value = min(value, self.maximize(start, goal, action, newWrld, depth-1, alpha, beta))
                 if (value <= alpha):
                     return value
                 beta = min(beta, value)
@@ -715,115 +726,57 @@ class TestCharacter(CharacterEntity):
         a_star_score = self.a_star_heuristic2(start, goal)
 
         # Get enemy heuristic
-        enemyScore = self.enemyScore()
+        enemyScore = self.enemyScore(start, enemies)
 
-        # Get BombAboutToExplode heuristic
-
-
-
-        # if there are no bombs, don't worry about avoiding them
-        if len(bombs) == 0:
-            enemyInRange = False
-            for enemy in enemies:
-                if (abs(enemy[0] - start[0]) <= 7 or abs(enemy[1] - start[1]) <= 7):
-                    enemyInRange = True
-
-            if not enemyInRange:
-                if (wrld.wall_at(start[0] + a_star_move[0], start[1] + a_star_move[1]) and len(explosions) == 0):
-                    bestMove = 'B'
-                    return bestMove
-
-                highestScore = -1
-                for space in allSpaces:
-                    print("****************************")
-                    print(space)
-                    livingScore = abs(wrld.time)
-
-                    enemyScore = 0
-                    for enemyLoc in enemies:
-                        futureX = space[0]
-                        futureY = space[1]
-
-                        enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
-                        if (enemyDis < 4):
-                            enemyScore = enemyScore - ((4 - enemyDis) * 6)
-
-                    a_star_score = 0
-                    # if(a_star_move == allDirections[i]):
-                    if (start[0] + a_star_move[0] == space[0]) and (start[1] + a_star_move[1] == space[1]):
-                        a_star_score = 5
-
-                    totalScore = livingScore + a_star_score + enemyScore
-                    print(space[0] - start[0], space[1] - start[1], totalScore)
-                    if (totalScore > highestScore):
-                        highestScore = totalScore
-                        bestMove = (space[0] - start[0], space[1] - start[1])
-
-            else:  # enemy is in range
-                print("EXECUTING MINIMAX")
-                for action in allDirections:
-                    # Terminal Tests
-                    # Enemeny Next to Agent
-                    enemyNextTo = self.isEnemeyNextTo(start, action, enemies)
-                    if (enemyNextTo):
-                        totalScore = -100  # Temp Values??
-                    else:
-                        totalScore = self.maximize(start, action, wrld, depth, -infinity, infinity)
+        # Get Bomb about to explode heuristic
 
 
+        totalScore = a_star_score + enemyScore
+        return totalScore
 
-        # if there is a bomb, ignore a* and just stay alive. also don't put another bomb down
-        else:
 
-            highestScore = -1
-            for space in allSpaces:
-                print("****************************")
-                print(space)
-                livingScore = abs(wrld.time)
+    # Gets the enemy score of the current state
+    #
+    # PARAM: [ world, [int, int], (int, int)]: wrld: the current state of the world
+    #        [start.x, start.y]: start: the x and y coordinated the agent is located at
+    #        [list[(int, int)]]: enemies: the x and y coordinated of all the enemies
+    #
+    # RETRUNS: a score based on the proximity of enemies
+    #
+    def enemyScore(self, start, enemies):
+        # Max Number of enemies is 2
+        maxEnemies = 2
 
-                # try not to walk onto a bomb
-                bombScore = 0
-                onBomb = False
-                for bombLoc in bombs:
-                    if (space[0] == bombLoc[0] and space[1] == bombLoc[1]):
-                        print("bomb at", bombLoc)
-                        bombScore += -10
+        # The lower the number of enemies the better
+        enemyExistanceScore = (maxEnemies - len(enemies)) * 50
 
-                    if (start[0] == bombLoc[0] and start[1] == bombLoc[1]):
-                        onBomb = True
+        # Farther away enemies are the better
+        enemyProx = 0
+        for enemyLoc in enemies:
+            enemyDis = math.sqrt((enemyLoc[0] - start[0]) ** 2 + (enemyLoc[1] - start[1]) ** 2)
+            if (enemyDis < 4):
+                enemyProx = enemyProx - ((4 - enemyDis) * 6)
 
-                # try not to walk onto an explosion
-                explosionScore = 0
-                for explosionLoc in explosions:
-                    if (space[0] == explosionLoc[0] and space[1] == explosionLoc[1]):
-                        explosionScore += -5
+        totalEnemyScore = enemyExistanceScore + enemyProx
+        return -totalEnemyScore
 
-                # unless you are standing on a bomb, try not to walk into a space that is going to get exploded
-                for futureExplosionLoc in futureExplosions:
-                    if (space[0] == futureExplosionLoc[0] and space[1] == futureExplosionLoc[1]) and not onBomb:
-                        explosionScore += -5
 
-                enemyScore = 0
-                for enemyLoc in enemies:
-                    futureX = space[0]
-                    futureY = space[1]
+    # Gets the next board state
+    #
+    # PARAM: [world, [int, int], (int, int)]: wrld: the current state of the world
+    #        [int, int]: action: the action the agent is attempting to take
+    #
+    # RETRUNS: a new world state
+    #
+    def UpdateWrld(self, start, goal, action, wrld):
+        newSensedWrld = wrld.next()
+        newWrld = newSensedWrld[0]
 
-                    enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
-                    if (enemyDis < 4):
-                        enemyScore = enemyScore - ((4 - enemyDis) * 6)
+        # Move the agent in the new world
 
-                a_star_score = 0
-                # if(a_star_move == allDirections[i]):
-                if (start[0] + a_star_move[0] == space[0]) and (start[1] + a_star_move[1] == space[1]):
-                    a_star_score = 5
 
-                totalScore = livingScore + a_star_score + bombScore + explosionScore + enemyScore
-                print(space[0] - start[0], space[1] - start[1], totalScore)
-                if (totalScore > highestScore):
-                    highestScore = totalScore
-                    bestMove = (space[0] - start[0], space[1] - start[1])
+        return newWrld
 
-        return bestMove
 
 
     def dist(self, start, goal):
