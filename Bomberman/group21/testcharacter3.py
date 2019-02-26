@@ -613,42 +613,109 @@ class TestCharacter(CharacterEntity):
     # RETURNS: [int]: the maximum possible score for that direction
     #
     def maximize(self, start, goal, action, wrld, depth, alpha, beta):
-        # Retrieve all possible next moves
-        allDirections = self.getAllDirections(wrld, start)
+        # Terminal Test for if the Agent has died
+
+        # Update the world
+        newWrld = self.UpdateWrld(start, goal, action, wrld)
+
+        # Retrieve all possible next moves of the updated world
+        allDirections = self.getAllDirections(newWrld, start)
 
         # If max depth is reached, then evaluate current state
         if (depth == 0):  # call heuristics and return heruistic score
-            curState = self.scoreState(wrld, start, goal)
+            first = True
+            maxVal = 0
+            value = 0
+            for action in allDirections:
+                value = self.scoreState(wrld, start, goal, action)
 
-        print()
+                if (first):
+                    maxVal = value
+                    first = False
+                else:
+                    if (value > maxVal):
+                        maxVal = value
 
+            return maxVal
 
-    def minimize(self):
-        print()
+        else:
+            value = -infinity
+            for action in allDirections:
+                value = max(value, self.minimize(start, goal, action, wrld, depth-1, alpha, beta))
+                if (value >= beta):
+                    return value
+                alpha = max(alpha, value)
 
+            return value
 
+    # Returns the minimum move score that leads the agent closer to the goal based on a minimax decision
+    #
+    # PARAM: [(int, int)] start: the x and y coordinated the agent is located at
+    #        [(int, int)] goal: the x and y coordinate of the goal
+    #        [(int, int)] action: the dx and dy direction the
+    #        [world] wrld: the current state of the world
+    #        [int] depth: the current depth of the board
+    #        [int] alpha
+    #        [int] beta
+    #
+    # RETURNS: [int]: the maximum possible score for that direction
+    #
+    def minimize(self, start, goal, action, wrld, depth, alpha, beta):
+        # Terminal Test for if the Agent has died
 
-    def minimaxScore(self):
-        print()
+        # Update the world
+        newWrld = self.UpdateWrld(start, goal, action, wrld)
+
+        # Retrieve all possible next moves of the updated world
+        allDirections = self.getAllDirections(newWrld, start)
+
+        # If max depth is reached, then evaluate current state
+        if (depth == 0):  # call heuristics and return heruistic score
+
+            first = True
+            minVal = 0
+            value = 0
+            for action in allDirections:
+                value = self.scoreState(wrld, start, goal, action)
+
+                if (first):
+                    minVal = value
+                    first = False
+                else:
+                    if (value < minVal):
+                        minVal = value
+
+            return minVal
+
+        else:
+            value = infinity
+            for outcomes in boards:
+                value = min(value, self.maximize(start, goal, action, wrld, depth-1, alpha, beta))
+                if (value <= alpha):
+                    return value
+                beta = min(beta, value)
+
+            return value
 
     # Gets the score of the current state based on heuristics
     #
     # PARAM: [ world, [int, int], (int, int)]: wrld: the current state of the world
     #                                          [start.x, start.y]: the x and y coordinated the agent is located at
     #                                          [goal.x, goal.y]: the x and y coordinated of the goal / exit
-    #                                          allDirections: a list of all the directions the agent can go
+    #                                          [(int, int)] action: the action for the agent to evaluate
     #
     # RETRUNS: the best move for the agent
     #
-    def scoreState(self, wrld, start, goal):
+    def scoreState(self, wrld, start, goal, action):
         enemies = self.getEnemy(wrld)
         bombs = self.getBomb(wrld)
         explosions = self.getExplosion(wrld)
 
         # Get A* heuristic
-        a_star_heuristic = self.a_star_heuristic2(start, goal)
+        a_star_score = self.a_star_heuristic2(start, goal)
 
         # Get enemy heuristic
+        enemyScore = self.enemyScore()
 
         # Get BombAboutToExplode heuristic
 
