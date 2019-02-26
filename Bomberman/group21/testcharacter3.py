@@ -103,6 +103,10 @@ class TestCharacter(CharacterEntity):
 
             else: # enemy is in range
                 print("EXECUTING MINIMAX")
+
+                # Consider placing a bomb as an action
+                allDirections.append('B')
+
                 for action in allDirections:
                     # Terminal Tests
                     # Enemeny Next to Agent
