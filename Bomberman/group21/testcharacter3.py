@@ -1,5 +1,6 @@
 # This is necessary to find the main code
 import sys
+
 sys.path.insert(0, '../bomberman')
 # Import necessary stuff
 from entity import CharacterEntity
@@ -58,118 +59,125 @@ class TestCharacter(CharacterEntity):
         a_star_move = self.get_a_star_move(wrld, start, goal)
         bestMove = (a_star_move[0], a_star_move[1])
 
-        # print("******************\nA* Move\n******************")
-        # print(start)
-        # print(a_star_move)
-        # print("******************")
 
         # if there are no bombs, don't worry about avoiding them
-        if len(bombs) == 0:
-            enemyInRange = False
-            for enemy in enemies:
-                if (abs(enemy[0] - start[0]) <= 7 or abs(enemy[1] - start[1]) <= 7):
-                    enemyInRange = True
+        # if len(bombs) == 0:
+        #     enemyInRange = False
+        #     for enemy in enemies:
+        #         if (abs(enemy[0] - start[0]) <= 7 or abs(enemy[1] - start[1]) <= 7):
+        #             enemyInRange = True
+        #
+        #     if not enemyInRange:
+        #         if (wrld.wall_at(start[0]+a_star_move[0], start[1]+a_star_move[1]) and len(explosions) == 0):
+        #             bestMove = 'B'
+        #             return bestMove
+        #
+        #         highestScore = -1
+        #         for space in allSpaces:
+        #             print("****************************")
+        #             print(space)
+        #             livingScore = abs(wrld.time)
+        #
+        #             enemyScore = 0
+        #             for enemyLoc in enemies:
+        #                 futureX = space[0]
+        #                 futureY = space[1]
+        #
+        #                 enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
+        #                 if (enemyDis < 4):
+        #                     enemyScore = enemyScore - ((4 - enemyDis) * 6)
+        #
+        #             a_star_score = 0
+        #             # if(a_star_move == allDirections[i]):
+        #             if (start[0]+a_star_move[0] == space[0]) and (start[1]+a_star_move[1] == space[1]):
+        #                 a_star_score = 5
+        #
+        #             totalScore = livingScore + a_star_score + enemyScore
+        #             print(space[0] - start[0], space[1]-start[1], totalScore)
+        #             if(totalScore > highestScore):
+        #                 highestScore = totalScore
+        #                 bestMove = (space[0] - start[0], space[1]-start[1])
+        #
+        #     else: # enemy is in range
+        print("EXECUTING MINIMAX")
 
-            if not enemyInRange:
-                if (wrld.wall_at(start[0]+a_star_move[0], start[1]+a_star_move[1]) and len(explosions) == 0):
-                    bestMove = 'B'
-                    return bestMove
+        # Consider placing a bomb as an action
+        allDirections.append('B')
 
-                highestScore = -1
-                for space in allSpaces:
-                    print("****************************")
-                    print(space)
-                    livingScore = abs(wrld.time)
+        bestMove = -1
+        bestValue = -1
+        index = 0
+        for action in allDirections:
+            value = self.maximize(start, goal, action, wrld, depth, -infinity, infinity)
+            print(action, value)
 
-                    enemyScore = 0
-                    for enemyLoc in enemies:
-                        futureX = space[0]
-                        futureY = space[1]
+            if (bestMove == -1):
+                bestMove = allDirections[index]
+                bestValue = value
 
-                        enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
-                        if (enemyDis < 4):
-                            enemyScore = enemyScore - ((4 - enemyDis) * 6)
+            else:
+                if (value > bestValue):
+                    bestValue = value
+                    bestMove = allDirections[index]
 
-                    a_star_score = 0
-                    # if(a_star_move == allDirections[i]):
-                    if (start[0]+a_star_move[0] == space[0]) and (start[1]+a_star_move[1] == space[1]):
-                        a_star_score = 5
+            index += 1
 
-                    totalScore = livingScore + a_star_score + enemyScore
-                    print(space[0] - start[0], space[1]-start[1], totalScore)
-                    if(totalScore > highestScore):
-                        highestScore = totalScore
-                        bestMove = (space[0] - start[0], space[1]-start[1])
-
-            else: # enemy is in range
-                print("EXECUTING MINIMAX")
-
-                # Consider placing a bomb as an action
-                allDirections.append('B')
-
-                for action in allDirections:
-                    # Terminal Tests
-                    # Enemeny Next to Agent
-                    enemyNextTo = self.isEnemeyNextTo(start, action, enemies)
-                    if(enemyNextTo):
-                        totalScore = -100 # Temp Values??
-                    else:
-                        totalScore = self.maximize(start, goal, action, wrld, depth, -infinity, infinity)
+        return bestMove
 
 
 
         # if there is a bomb, ignore a* and just stay alive. also don't put another bomb down
-        else:
-
-            highestScore = -1
-            for space in allSpaces:
-                print("****************************")
-                print(space)
-                livingScore = abs(wrld.time)
-
-                # try not to walk onto a bomb
-                bombScore = 0
-                onBomb = False
-                for bombLoc in bombs:
-                    if (space[0] == bombLoc[0] and space[1] == bombLoc[1]):
-                        print("bomb at", bombLoc)
-                        bombScore += -10
-
-                    if (start[0] == bombLoc[0] and start[1] == bombLoc[1]):
-                        onBomb = True
-
-                # try not to walk onto an explosion
-                explosionScore = 0
-                for explosionLoc in explosions:
-                    if (space[0] == explosionLoc[0] and space[1] == explosionLoc[1]):
-                        explosionScore += -5
-
-                # unless you are standing on a bomb, try not to walk into a space that is going to get exploded
-                for futureExplosionLoc in futureExplosions:
-                    if (space[0] == futureExplosionLoc[0] and space[1] == futureExplosionLoc[1]) and not onBomb:
-                        explosionScore += -5
-
-                enemyScore = 0
-                for enemyLoc in enemies:
-                    futureX = space[0]
-                    futureY = space[1]
-
-                    enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
-                    if (enemyDis < 4):
-                        enemyScore = enemyScore - ((4 - enemyDis) * 6)
-
-                a_star_score = 0
-                # if(a_star_move == allDirections[i]):
-                if (start[0] + a_star_move[0] == space[0]) and (start[1] + a_star_move[1] == space[1]):
-                    a_star_score = 5
-
-                totalScore = livingScore + a_star_score + bombScore + explosionScore + enemyScore
-                print(space[0] - start[0], space[1] - start[1], totalScore)
-                if (totalScore > highestScore):
-                    highestScore = totalScore
-                    bestMove = (space[0] - start[0], space[1] - start[1])
-
-        return bestMove
+        # else:
+        #
+        #     highestScore = -1
+        #     for space in allSpaces:
+        #         print("****************************")
+        #         print(space)
+        #         livingScore = abs(wrld.time)
+        #
+        #         # try not to walk onto a bomb
+        #         bombScore = 0
+        #         onBomb = False
+        #         for bombLoc in bombs:
+        #             if (space[0] == bombLoc[0] and space[1] == bombLoc[1]):
+        #                 print("bomb at", bombLoc)
+        #                 bombScore += -10
+        #
+        #             if (start[0] == bombLoc[0] and start[1] == bombLoc[1]):
+        #                 onBomb = True
+        #
+        #         # try not to walk onto an explosion
+        #         explosionScore = 0
+        #         for explosionLoc in explosions:
+        #             if (space[0] == explosionLoc[0] and space[1] == explosionLoc[1]):
+        #                 explosionScore += -5
+        #
+        #         # unless you are standing on a bomb, try not to walk into a space that is going to get exploded
+        #         for futureExplosionLoc in futureExplosions:
+        #             if (space[0] == futureExplosionLoc[0] and space[1] == futureExplosionLoc[1]) and not onBomb:
+        #                 explosionScore += -5
+        #
+        #         enemyScore = 0
+        #         for enemyLoc in enemies:
+        #             futureX = space[0]
+        #             futureY = space[1]
+        #
+        #             enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
+        #             if (enemyDis < 4):
+        #                 enemyScore = enemyScore - ((4 - enemyDis) * 6)
+        #
+        #         a_star_score = 0
+        #         # if(a_star_move == allDirections[i]):
+        #         if (start[0] + a_star_move[0] == space[0]) and (start[1] + a_star_move[1] == space[1]):
+        #             a_star_score = 5
+        #
+        #         totalScore = livingScore + a_star_score + bombScore + explosionScore + enemyScore
+        #         print(space[0] - start[0], space[1] - start[1], totalScore)
+        #         if (totalScore > highestScore):
+        #             highestScore = totalScore
+        #             bestMove = (space[0] - start[0], space[1] - start[1])
+        #
+        # return bestMove
 
 
     # Gets the locations of the enemies location
@@ -723,15 +731,17 @@ class TestCharacter(CharacterEntity):
         explosions = self.getExplosion(wrld)
 
         # Get A* heuristic
-        a_star_score = self.a_star_heuristic2(start, goal)
+        if(action != 'B'):
+            start = (start[0] + action[0], start[1] + action[1])
+        a_star_score = self.dist(start, goal)
 
         # Get enemy heuristic
         enemyScore = self.enemyScore(start, enemies)
 
         # Get Bomb about to explode heuristic
+        bombScore = self.bombScore(start, explosions)
 
-
-        totalScore = a_star_score + enemyScore
+        totalScore = a_star_score # + enemyScore + bombScore
         return totalScore
 
 
@@ -748,7 +758,7 @@ class TestCharacter(CharacterEntity):
         maxEnemies = 2
 
         # The lower the number of enemies the better
-        enemyExistanceScore = (maxEnemies - len(enemies)) * 50
+        enemyExistanceScore = (maxEnemies - len(enemies)) * 10
 
         # Farther away enemies are the better
         enemyProx = 0
@@ -759,6 +769,26 @@ class TestCharacter(CharacterEntity):
 
         totalEnemyScore = enemyExistanceScore + enemyProx
         return -totalEnemyScore
+
+
+
+    # Gets the bomb score of the current state
+    #
+    # PARAM: [start.x, start.y]: start: the x and y coordinated the agent is located at
+    #        [list(x, y)] explosions: list of explosions
+    #
+    # RETRUNS: a score based on the proximity of explosion
+    #
+    def bombScore(self, start, explosions):
+        bombScore = 0
+
+        for fire in explosions:
+            if(start[0] == fire[0]):
+                bombScore = bombScore + 20
+            if (start[1] == fire[1]):
+                bombScore = bombScore + 20
+
+        return -bombScore
 
 
     # Gets the next board state
@@ -772,8 +802,30 @@ class TestCharacter(CharacterEntity):
         newSensedWrld = wrld.next()
         newWrld = newSensedWrld[0]
 
-        # Move the agent in the new world
+        # Get the agent and monsters in the new world
+        print(next(iter(newWrld.characters.values()))[0])
+        agentSim = next(iter(newWrld.characters.values()))[0]
+        monsterSim = next(iter(newWrld.monsters.values()))[0]
 
+        # Move the agent
+        if(action != 'B'):
+            agentSim.move(action[0], action[1])
+        else:
+            agentSim.place_bomb()
+
+        # Move the monsters
+        # Get direction leading to agent
+        monsterX = 0
+        monsterY = 0
+        if(monsterSim.x > agentSim.x):
+            monsterX = -1
+        elif (monsterSim.x < agentSim.x):
+            monsterX = 1
+        if (monsterSim.y > agentSim.y):
+            monsterY = -1
+        elif (monsterSim.y < agentSim.y):
+            monsterY = 1
+        monsterSim.move(monsterX, monsterY)
 
         return newWrld
 
