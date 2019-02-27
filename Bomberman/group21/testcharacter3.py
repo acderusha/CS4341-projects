@@ -11,7 +11,7 @@ from events import Event
 import math
 
 infinity = 1000000
-depth = 6
+depth = 4
 
 class TestCharacter(CharacterEntity):
 
