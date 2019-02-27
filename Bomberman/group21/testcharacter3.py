@@ -11,7 +11,7 @@ from events import Event
 import math
 
 infinity = 1000000
-depth = 4
+depth = 6
 
 class TestCharacter(CharacterEntity):
 
@@ -63,7 +63,7 @@ class TestCharacter(CharacterEntity):
         # checks if there is an enemy within 2 blocks
         enemyInRange = False
         for enemy in enemies:
-            if (abs(enemy[0] - start[0]) <= 3 and abs(enemy[1] - start[1]) <= 3):
+            if (math.sqrt((enemy[0] - start[0]) ** 2 +  (enemy[1] - start[1]) ** 2 )<= 4):
                 enemyInRange = True
 
         print(bombs)
