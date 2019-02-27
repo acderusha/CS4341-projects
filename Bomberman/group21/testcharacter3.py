@@ -62,7 +62,7 @@ class TestCharacter(CharacterEntity):
         # checks if there is an enemy within 2 blocks
         enemyInRange = False
         for enemy in enemies:
-            if (abs(enemy[0] - start[0]) <= 7 or abs(enemy[1] - start[1]) <= 7):
+            if (abs(enemy[0] - start[0]) <= 3 and abs(enemy[1] - start[1]) <= 3):
                 enemyInRange = True
 
         if not enemyInRange and len(bombs) > 0:
