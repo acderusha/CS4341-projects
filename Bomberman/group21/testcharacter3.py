@@ -803,7 +803,6 @@ class TestCharacter(CharacterEntity):
         newWrld = newSensedWrld[0]
 
         # Get the agent and monsters in the new world
-        print(next(iter(newWrld.characters.values()))[0])
         agentSim = next(iter(newWrld.characters.values()))[0]
         monsterSim = next(iter(newWrld.monsters.values()))[0]
 
