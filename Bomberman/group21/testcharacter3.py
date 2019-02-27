@@ -7,6 +7,7 @@ from entity import CharacterEntity
 from colorama import Fore, Back
 # Imports for code implementation
 from queue import PriorityQueue
+from events import Event
 import math
 
 infinity = 1000000
@@ -65,7 +66,8 @@ class TestCharacter(CharacterEntity):
             if (abs(enemy[0] - start[0]) <= 7 or abs(enemy[1] - start[1]) <= 7):
                 enemyInRange = True
 
-        if not enemyInRange and len(bombs) > 0:
+        print(bombs)
+        if (not enemyInRange) and (len(bombs) == 0):
             # if there are no bombs, don't worry about avoiding them
             # if len(bombs) == 0:
             if (wrld.wall_at(start[0]+a_star_move[0], start[1]+a_star_move[1]) and len(explosions) == 0):
@@ -74,8 +76,6 @@ class TestCharacter(CharacterEntity):
 
             highestScore = -1
             for space in allSpaces:
-                print("****************************")
-                print(space)
                 livingScore = abs(wrld.time)
 
                 enemyScore = 0
@@ -98,29 +98,29 @@ class TestCharacter(CharacterEntity):
                     highestScore = totalScore
                     bestMove = (space[0] - start[0], space[1]-start[1])
         #
-        #     else: # enemy is in range
-        print("EXECUTING MINIMAX")
+        else: # enemy is in range
+            print("EXECUTING MINIMAX")
 
-        # Consider placing a bomb as an action
-        allDirections.append('B')
+            # Consider placing a bomb as an action
+            allDirections.append('B')
 
-        bestMove = -1
-        bestValue = -1
-        index = 0
-        for action in allDirections:
-            value = self.maximize(start, goal, action, wrld, depth, -infinity, infinity)
-            print(action, value)
+            bestMove = -1
+            bestValue = -1
+            index = 0
+            for action in allDirections:
+                value = self.maximize(start, goal, action, wrld, depth, -infinity, infinity)
+                print(action, value)
 
-            if (bestMove == -1):
-                bestMove = allDirections[index]
-                bestValue = value
-
-            else:
-                if (value > bestValue):
-                    bestValue = value
+                if (bestMove == -1):
                     bestMove = allDirections[index]
+                    bestValue = value
 
-            index += 1
+                else:
+                    if (value > bestValue):
+                        bestValue = value
+                        bestMove = allDirections[index]
+
+                index += 1
 
         return bestMove
 
@@ -576,8 +576,8 @@ class TestCharacter(CharacterEntity):
         defaultMove = (0,0)
         a_star_path = self.a_star_search(wrld, start, goal)
         print("****************************************")
-        print(a_star_path[0])
-        print(a_star_path[1])
+        # print(a_star_path[0])
+        # print(a_star_path[1])
 
         direction = self.findPath(start, goal, wrld, a_star_path)
 
@@ -628,10 +628,17 @@ class TestCharacter(CharacterEntity):
     # RETURNS: [int]: the maximum possible score for that direction
     #
     def maximize(self, start, goal, action, wrld, depth, alpha, beta):
-        # Terminal Test for if the Agent has died
-
         # Update the world
-        newWrld = self.UpdateWrld(start, goal, action, wrld)
+        newWrldState = self.UpdateWrld(start, goal, action, wrld)
+        newWrld = newWrldState[0]
+        events = newWrldState[1]
+
+        # Terminal Test for if the Agent has died
+        # check to see if char died
+        for event in events:
+            if event.tpe == Event.BOMB_HIT_CHARACTER or event.tpe == Event.CHARACTER_KILLED_BY_MONSTER:
+                return -infinity
+
 
         # Retrieve all possible next moves of the updated world
         allDirections = self.getAllDirections(newWrld, start)
@@ -644,7 +651,7 @@ class TestCharacter(CharacterEntity):
             maxVal = 0
             value = 0
             for action in allDirections:
-                value = self.scoreState(wrld, start, goal, action)
+                value = self.scoreState(newWrld, start, goal, action)
 
                 if (first):
                     maxVal = value
@@ -678,10 +685,16 @@ class TestCharacter(CharacterEntity):
     # RETURNS: [int]: the maximum possible score for that direction
     #
     def minimize(self, start, goal, action, wrld, depth, alpha, beta):
-        # Terminal Test for if the Agent has died
-
         # Update the world
-        newWrld = self.UpdateWrld(start, goal, action, wrld)
+        newWrldState = self.UpdateWrld(start, goal, action, wrld)
+        newWrld = newWrldState[0]
+        events = newWrldState[1]
+
+        # Terminal Test for if the Agent has died
+        # check to see if char died
+        for event in events:
+            if event.tpe == Event.BOMB_HIT_CHARACTER or event.tpe == Event.CHARACTER_KILLED_BY_MONSTER:
+                return -infinity
 
         # Retrieve all possible next moves of the updated world
         allDirections = self.getAllDirections(newWrld, start)
@@ -695,7 +708,7 @@ class TestCharacter(CharacterEntity):
             minVal = 0
             value = 0
             for action in allDirections:
-                value = self.scoreState(wrld, start, goal, action)
+                value = self.scoreState(newWrld, start, goal, action)
 
                 if (first):
                     minVal = value
@@ -799,12 +812,8 @@ class TestCharacter(CharacterEntity):
     # RETRUNS: a new world state
     #
     def UpdateWrld(self, start, goal, action, wrld):
-        newSensedWrld = wrld.next()
-        newWrld = newSensedWrld[0]
-
         # Get the agent and monsters in the new world
-        agentSim = next(iter(newWrld.characters.values()))[0]
-        monsterSim = next(iter(newWrld.monsters.values()))[0]
+        agentSim = wrld.me(self)
 
         # Move the agent
         if(action != 'B'):
@@ -814,19 +823,23 @@ class TestCharacter(CharacterEntity):
 
         # Move the monsters
         # Get direction leading to agent
-        monsterX = 0
-        monsterY = 0
-        if(monsterSim.x > agentSim.x):
-            monsterX = -1
-        elif (monsterSim.x < agentSim.x):
-            monsterX = 1
-        if (monsterSim.y > agentSim.y):
-            monsterY = -1
-        elif (monsterSim.y < agentSim.y):
-            monsterY = 1
-        monsterSim.move(monsterX, monsterY)
+        if(len(self.getEnemy(wrld)) > 0):
+            monsterSim = next(iter(wrld.monsters.values()))[0]
+            monsterX = 0
+            monsterY = 0
+            if(monsterSim.x > agentSim.x):
+                monsterX = -1
+            elif (monsterSim.x < agentSim.x):
+                monsterX = 1
+            if (monsterSim.y > agentSim.y):
+                monsterY = -1
+            elif (monsterSim.y < agentSim.y):
+                monsterY = 1
+            monsterSim.move(monsterX, monsterY)
 
-        return newWrld
+        newSensedWrld = wrld.next()
+
+        return newSensedWrld
 
 
 
