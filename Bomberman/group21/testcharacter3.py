@@ -8,6 +8,8 @@ from colorama import Fore, Back
 from queue import PriorityQueue
 import math
 
+infinity = 1000000
+
 class TestCharacter(CharacterEntity):
 
     def do(self, wrld):
@@ -62,10 +64,6 @@ class TestCharacter(CharacterEntity):
 
         # if there are no bombs, don't worry about avoiding them
         if len(bombs) == 0:
-            # Deterermine if agent can move that direction
-            # if (a_star_move not in allDirections and len(bombs) != 1 and len(explosions) == 0):
-            #     bestMove = 'B'
-            #     return bestMove
             if (wrld.wall_at(start[0]+a_star_move[0], start[1]+a_star_move[1]) and len(explosions) == 0):
                 bestMove = 'B'
                 return bestMove
@@ -76,21 +74,15 @@ class TestCharacter(CharacterEntity):
                 print(space)
                 livingScore = abs(wrld.time)
 
-                enemyScore = 0
-                for enemyLoc in enemies:
-                    futureX = space[0]
-                    futureY = space[1]
-
-                    enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
-                    if (enemyDis < 4):
-                        enemyScore = enemyScore - ((4 - enemyDis) * 6)
+                enemyScore = self.getEnemyScore(wrld, space)
+                locationScore = self.getLocationScore(wrld, space)
 
                 a_star_score = 0
                 # if(a_star_move == allDirections[i]):
                 if (start[0]+a_star_move[0] == space[0]) and (start[1]+a_star_move[1] == space[1]):
                     a_star_score = 5
 
-                totalScore = livingScore + a_star_score + enemyScore
+                totalScore = livingScore + a_star_score + enemyScore + locationScore
                 print(space[0] - start[0], space[1]-start[1], totalScore)
                 if(totalScore > highestScore):
                     highestScore = totalScore
@@ -128,13 +120,13 @@ class TestCharacter(CharacterEntity):
                         explosionScore += -5
 
                 enemyScore = 0
-                for enemyLoc in enemies:
-                    futureX = space[0]
-                    futureY = space[1]
-
-                    enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
-                    if (enemyDis < 4):
-                        enemyScore = enemyScore - ((4 - enemyDis) * 6)
+                # for enemyLoc in enemies:
+                #     futureX = space[0]
+                #     futureY = space[1]
+                #
+                #     enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
+                #     if (enemyDis < 3):
+                #         enemyScore = enemyScore - ((3 - enemyDis) * 6)
 
                 a_star_score = 0
                 # if(a_star_move == allDirections[i]):
@@ -167,6 +159,71 @@ class TestCharacter(CharacterEntity):
                     enemies.append((x, y))
 
         return enemies
+
+    # Gets an enemy score based on enemy locations
+    #
+    # PARAM: [world] wrld: the current state of the world
+    #
+    # RETURNS: [int] enemyScore: a score based on enemy locations
+    #
+    def getEnemyScore(self, wrld, space=False):
+        minDis = 3.5
+        weight = 10
+
+        if(space == False):
+            enemyScore = 0
+            enemies = self.getEnemy(wrld)
+            for enemyLoc in enemies:
+                enemyDis = math.sqrt((enemyLoc[0] - self.x) ** 2 + (enemyLoc[1] - self.y) ** 2)
+                if (enemyDis < minDis):
+                    enemyScore = enemyScore - ((minDis - enemyDis) * weight)
+                if(enemyDis < 3):
+                    enemyScore = -infinity
+
+        else:
+            enemies = self.getEnemy(wrld)
+            enemyScore = 0
+            for enemyLoc in enemies:
+                futureX = space[0]
+                futureY = space[1]
+
+                enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
+                if (enemyDis < minDis):
+                    enemyScore = enemyScore - ((minDis - enemyDis) * weight)
+                if (enemyDis < 3):
+                    enemyScore = -infinity
+
+        return enemyScore
+
+
+    # Gets a score based on self location
+    #
+    # PARAM: [world] wrld: the current state of the world
+    #
+    # RETURNS: [int] locationScore: a score based on self location
+    #
+    def getLocationScore(self, wrld, space=False):
+        # Being next to an edge offers less mobility
+        locationScore = 0
+        width = wrld.width()
+        height = wrld.height()
+
+        if (space == False):
+            if(self.x == 0 or self.x == width - 1):
+                locationScore = locationScore - 2
+
+            if(self.y == 0 or self.y == height - 1):
+                locationScore = locationScore - 2
+
+        else:
+            if (space[0] == 0 or space[0] == width - 1):
+                locationScore = locationScore - 2
+
+            if (self.y == 0 or self.y == height - 1):
+                locationScore = locationScore - 2
+
+        return locationScore
+
 
     # Gets the locations of the bomb location
     #
@@ -300,7 +357,7 @@ class TestCharacter(CharacterEntity):
                     new_cost = cost_so_far[current] + 1
                 if next not in cost_so_far or new_cost < cost_so_far[next]:
                     cost_so_far[next] = new_cost
-                    priority = new_cost + self.a_star_heuristic2(goal, next)
+                    priority = new_cost + self.a_star_heuristic2(goal, next, wrld)
                     frontier.put(next, priority)
                     came_from[next] = current
 
@@ -322,8 +379,11 @@ class TestCharacter(CharacterEntity):
     #        [start.x, start.y] current: the x and y coordinated the agent is located at
     # RETURNS: [int] distance: distance between the current agent location and the goal
     #
-    def a_star_heuristic2(self, goal, next):
-        return math.sqrt(((goal[0] - next[0]) ** 2) + ((goal[1] - next[1]) ** 2))
+    def a_star_heuristic2(self, goal, next, wrld):
+        enemyScore = self.getEnemyScore(wrld)
+        locationScore = self.getLocationScore(wrld, next)
+
+        return math.sqrt(((goal[0] - next[0]) ** 2) + ((goal[1] - next[1]) ** 2)) + enemyScore + locationScore
 
     # Returns list of all the possible moves for agent (up, down, left, right, diagonal)
     #
