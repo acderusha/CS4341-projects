@@ -163,7 +163,7 @@ class TestCharacter(CharacterEntity):
     # RETURNS: [int] enemyScore: a score based on enemy locations
     #
     def getEnemyScore(self, wrld, space=False):
-        minDis = 3.5
+        minDis = 4
         weight = 10
 
         if(space == False):
