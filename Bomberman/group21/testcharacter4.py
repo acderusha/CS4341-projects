@@ -290,7 +290,7 @@ class TestCharacter(CharacterEntity):
         cost_so_far[start] = 0
         enemyNearChar = False
         for enemy in self.getEnemy(wrld):
-            if self.isWithinMonsterRange(start, enemy, 3):
+            if self.isWithinMonsterRange(start, enemy, 4):
                 enemyNearChar = True
                 break
 
@@ -301,19 +301,22 @@ class TestCharacter(CharacterEntity):
                 break
 
             for next in self.getAllMoves(wrld, current):
+                wall = False
                 if (wrld.wall_at(next[0], next[1])):
                     new_cost = cost_so_far[current] + 20 # + graph.cost(current, next)
+                    wall = True
                 else: # if there is a wall there
                     inEnemyRange = False
+                    inFutureBombRange = False
                     if enemyNearChar:
                         for enemy in self.getEnemy(wrld):
-                            if self.isWithinMonsterRange(next, enemy, 1):
+                            if self.isWithinMonsterRange(next, enemy, 2):
                                 inEnemyRange = True
                                 break
 
                         for fe in self.getFutureExplosions(wrld):
                             if self.isWithinMonsterRange(next, fe, 0):
-                                inEnemyRange = True
+                                inFutureBombRange = True
                                 break
 
                         for e in self.getExplosion(wrld):
@@ -321,13 +324,20 @@ class TestCharacter(CharacterEntity):
                                 inEnemyRange = True
                                 break
 
-                    if inEnemyRange:
-                        new_cost = cost_so_far[current] + 10000000
-                    else:
-                        new_cost = cost_so_far[current] + 1
+                    # if inEnemyRange:
+                    #     new_cost = cost_so_far[current] + 10000000
+                    # elif inFutureBombRange:
+                    #     new_cost = cost_so_far[current] + 500
+                    # else:
+                    new_cost = cost_so_far[current] + 1
                 if next not in cost_so_far or new_cost < cost_so_far[next]:
                     cost_so_far[next] = new_cost
-                    priority = new_cost + self.a_star_heuristic2(goal, next)
+                    heuristic3 = 0
+                    if not wall and inEnemyRange:
+                        heuristic3 =  10000000
+                    elif not wall and inFutureBombRange:
+                        heuristic3 = 500
+                    priority = new_cost + self.a_star_heuristic2(goal, next) + heuristic3
                     frontier.put(next, priority)
                     came_from[next] = current
 
