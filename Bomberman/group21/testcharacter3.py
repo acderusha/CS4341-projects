@@ -11,7 +11,7 @@ from events import Event
 import math
 
 infinity = 1000000
-depth = 3
+depth = 6
 
 class TestCharacter(CharacterEntity):
 
@@ -63,7 +63,7 @@ class TestCharacter(CharacterEntity):
         # checks if there is an enemy within 2 blocks
         enemyInRange = False
         for enemy in enemies:
-            if (abs(enemy[0] - start[0]) <= 7 or abs(enemy[1] - start[1]) <= 7):
+            if (abs(enemy[0] - start[0]) <= 3 and abs(enemy[1] - start[1]) <= 3):
                 enemyInRange = True
 
         print(bombs)
@@ -754,7 +754,7 @@ class TestCharacter(CharacterEntity):
         # Get Bomb about to explode heuristic
         bombScore = self.bombScore(start, explosions)
 
-        totalScore = a_star_score # + enemyScore + bombScore
+        totalScore = a_star_score + enemyScore + bombScore
         return totalScore
 
 
@@ -779,6 +779,8 @@ class TestCharacter(CharacterEntity):
             enemyDis = math.sqrt((enemyLoc[0] - start[0]) ** 2 + (enemyLoc[1] - start[1]) ** 2)
             if (enemyDis < 4):
                 enemyProx = enemyProx - ((4 - enemyDis) * 6)
+            if(enemyDis < 3):
+                enemyProx = -infinity
 
         totalEnemyScore = enemyExistanceScore + enemyProx
         return -totalEnemyScore
