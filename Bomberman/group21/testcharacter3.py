@@ -59,44 +59,44 @@ class TestCharacter(CharacterEntity):
         a_star_move = self.get_a_star_move(wrld, start, goal)
         bestMove = (a_star_move[0], a_star_move[1])
 
+        # checks if there is an enemy within 2 blocks
+        enemyInRange = False
+        for enemy in enemies:
+            if (abs(enemy[0] - start[0]) <= 7 or abs(enemy[1] - start[1]) <= 7):
+                enemyInRange = True
 
-        # if there are no bombs, don't worry about avoiding them
-        # if len(bombs) == 0:
-        #     enemyInRange = False
-        #     for enemy in enemies:
-        #         if (abs(enemy[0] - start[0]) <= 7 or abs(enemy[1] - start[1]) <= 7):
-        #             enemyInRange = True
-        #
-        #     if not enemyInRange:
-        #         if (wrld.wall_at(start[0]+a_star_move[0], start[1]+a_star_move[1]) and len(explosions) == 0):
-        #             bestMove = 'B'
-        #             return bestMove
-        #
-        #         highestScore = -1
-        #         for space in allSpaces:
-        #             print("****************************")
-        #             print(space)
-        #             livingScore = abs(wrld.time)
-        #
-        #             enemyScore = 0
-        #             for enemyLoc in enemies:
-        #                 futureX = space[0]
-        #                 futureY = space[1]
-        #
-        #                 enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
-        #                 if (enemyDis < 4):
-        #                     enemyScore = enemyScore - ((4 - enemyDis) * 6)
-        #
-        #             a_star_score = 0
-        #             # if(a_star_move == allDirections[i]):
-        #             if (start[0]+a_star_move[0] == space[0]) and (start[1]+a_star_move[1] == space[1]):
-        #                 a_star_score = 5
-        #
-        #             totalScore = livingScore + a_star_score + enemyScore
-        #             print(space[0] - start[0], space[1]-start[1], totalScore)
-        #             if(totalScore > highestScore):
-        #                 highestScore = totalScore
-        #                 bestMove = (space[0] - start[0], space[1]-start[1])
+        if not enemyInRange:
+            # if there are no bombs, don't worry about avoiding them
+            # if len(bombs) == 0:
+            #     if (wrld.wall_at(start[0]+a_star_move[0], start[1]+a_star_move[1]) and len(explosions) == 0):
+            #         bestMove = 'B'
+            #         return bestMove
+            #
+            #     highestScore = -1
+            #     for space in allSpaces:
+            #         print("****************************")
+            #         print(space)
+            #         livingScore = abs(wrld.time)
+            #
+            #         enemyScore = 0
+            #         for enemyLoc in enemies:
+            #             futureX = space[0]
+            #             futureY = space[1]
+            #
+            #             enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
+            #             if (enemyDis < 4):
+            #                 enemyScore = enemyScore - ((4 - enemyDis) * 6)
+            #
+            #         a_star_score = 0
+            #         # if(a_star_move == allDirections[i]):
+            #         if (start[0]+a_star_move[0] == space[0]) and (start[1]+a_star_move[1] == space[1]):
+            #             a_star_score = 5
+            #
+            #         totalScore = livingScore + a_star_score + enemyScore
+            #         print(space[0] - start[0], space[1]-start[1], totalScore)
+            #         if(totalScore > highestScore):
+            #             highestScore = totalScore
+            #             bestMove = (space[0] - start[0], space[1]-start[1])
         #
         #     else: # enemy is in range
         print("EXECUTING MINIMAX")
