@@ -8,7 +8,7 @@ from game import Game
 
 # TODO This is your code!
 sys.path.insert(1, '../group21')
-from testcharacter3 import TestCharacter
+from testcharacterS1V1 import TestCharacter
 
 
 # Create the game
