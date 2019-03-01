@@ -65,7 +65,6 @@ class TestCharacter(CharacterEntity):
 
         print(allSpaces)
         for space in allSpaces:
-            print("I GET HERE")
             livingScore = abs(wrld.time)
 
             enemyScore = self.getEnemyScore(wrld, space)
