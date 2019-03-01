@@ -142,61 +142,6 @@ class TestCharacter(CharacterEntity):
         return bestMove
 
 
-
-        # if there is a bomb, ignore a* and just stay alive. also don't put another bomb down
-        # else:
-        #
-        #     highestScore = -1
-        #     for space in allSpaces:
-        #         print("****************************")
-        #         print(space)
-        #         livingScore = abs(wrld.time)
-        #
-        #         # try not to walk onto a bomb
-        #         bombScore = 0
-        #         onBomb = False
-        #         for bombLoc in bombs:
-        #             if (space[0] == bombLoc[0] and space[1] == bombLoc[1]):
-        #                 print("bomb at", bombLoc)
-        #                 bombScore += -10
-        #
-        #             if (start[0] == bombLoc[0] and start[1] == bombLoc[1]):
-        #                 onBomb = True
-        #
-        #         # try not to walk onto an explosion
-        #         explosionScore = 0
-        #         for explosionLoc in explosions:
-        #             if (space[0] == explosionLoc[0] and space[1] == explosionLoc[1]):
-        #                 explosionScore += -5
-        #
-        #         # unless you are standing on a bomb, try not to walk into a space that is going to get exploded
-        #         for futureExplosionLoc in futureExplosions:
-        #             if (space[0] == futureExplosionLoc[0] and space[1] == futureExplosionLoc[1]) and not onBomb:
-        #                 explosionScore += -5
-        #
-        #         enemyScore = 0
-        #         for enemyLoc in enemies:
-        #             futureX = space[0]
-        #             futureY = space[1]
-        #
-        #             enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
-        #             if (enemyDis < 4):
-        #                 enemyScore = enemyScore - ((4 - enemyDis) * 6)
-        #
-        #         a_star_score = 0
-        #         # if(a_star_move == allDirections[i]):
-        #         if (start[0] + a_star_move[0] == space[0]) and (start[1] + a_star_move[1] == space[1]):
-        #             a_star_score = 5
-        #
-        #         totalScore = livingScore + a_star_score + bombScore + explosionScore + enemyScore
-        #         print(space[0] - start[0], space[1] - start[1], totalScore)
-        #         if (totalScore > highestScore):
-        #             highestScore = totalScore
-        #             bestMove = (space[0] - start[0], space[1] - start[1])
-        #
-        # return bestMove
-
-
     # Gets the locations of the enemies location
     #
     # PARAM: [world] wrld: the current state of the world
