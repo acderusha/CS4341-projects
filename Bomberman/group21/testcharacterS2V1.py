@@ -5,12 +5,12 @@ sys.path.insert(0, '../bomberman')
 from entity import CharacterEntity
 from sensed_world import SensedWorld
 from events import Event
-import os.path
 from colorama import Fore, Back
 # Imports for code implementation
 from queue import PriorityQueue
 import random
 import math
+import os.path
 
 class TestCharacter(CharacterEntity):
 
@@ -693,7 +693,7 @@ class TestCharacter(CharacterEntity):
 
             s = newS
 
-        with open('../S1V2weights.txt', 'w+') as out:
+        with open('../S2V1weights.txt', 'w+') as out:
             for weight in w:
                 out.write(str(weight))
                 out.write("\n")
@@ -727,8 +727,8 @@ class TestCharacter(CharacterEntity):
             elif e.tpe == Event.BOMB_HIT_WALL:
                 score += 10
         me = s.me(self)
-        temp = (s.width() + s.height()) - self.a_star_heuristic(self.findGoal(s), (me.x, me.y))
-        score += temp*2
+        temp = (s.width() * s.height()) - self.a_star_heuristic(self.findGoal(s), (me.x, me.y))
+        score += temp*3
 
         return score
 
@@ -951,7 +951,7 @@ class TestCharacter(CharacterEntity):
     def putsMonsterInChaseRange(self, s, a):
         me = s.me(self)
         monsters = self.getEnemy(s)
-        MONSTER_RANGE = 2
+        MONSTER_RANGE = 1
         for m in monsters:
             if (m[0] < me.x + a[0] + MONSTER_RANGE and m[0] > me.x + a[0] - MONSTER_RANGE and \
                 m[1] < me.y + a[1] + MONSTER_RANGE and m[1] > me.y + a[1] - MONSTER_RANGE):
@@ -960,22 +960,22 @@ class TestCharacter(CharacterEntity):
 
 
     def getW(self):
-        if not os.path.isfile('../S1V2weights.txt'):
-            return [-626.4049349551361, -4620.690620596856, -1134.4802240159702,
-                    -1572.6866309594548, -624.2853288470031, 1.0, 115.39235469239887]
+        if not os.path.isfile('../S2V1weights.txt'):
+            return [1,1,1,1,1,1,1,1,1]
         w = []
-        with open('../S1V2weights.txt', 'r') as fd:
+        with open('../S2V1weights.txt', 'r') as fd:
             for line in fd:
                 w.append(float(line))
 
         f = self.getF()
         if len(w) != len(f):
             print("Using default weights")
-            return [-626.4049349551361, -4620.690620596856, -1134.4802240159702,
-                    -1572.6866309594548, -624.2853288470031, 1.0, 115.39235469239887]
+            return [1,1,1,1,1,1,1,1,1]
         else:
             return w
 
     def getF(self):
-        return [self.distToCloseMonster, self.distToGoal,
-             self.charIsOnFutureExplosion, self.distToExplosion, self.distToBomb]
+        return [self.numMonsters, self.distToCloseMonster, self.distToGoal,
+             self.charIsOnFutureExplosion, self.distToExplosion, self.distToBomb,
+             self.rowBelowIsAllWalls,
+             self.closestMonsterInLine, self.moveIsAStar]
