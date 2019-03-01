@@ -115,10 +115,6 @@ class TestCharacter(CharacterEntity):
             allSame = 0
             isAllSame = True
             for action in allDirections:
-                # Terminal Test
-
-
-
                 value = self.maximize(start, goal, action, wrld, depth, -infinity, infinity)
                 print(action, value)
 
