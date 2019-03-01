@@ -200,23 +200,24 @@ class TestCharacter(CharacterEntity):
     #
     def getLocationScore(self, wrld, space=False):
         # Being next to an edge offers less mobility
+        locationWeight = 10
         locationScore = 0
         width = wrld.width()
         height = wrld.height()
 
         if (space == False):
             if(self.x == 0 or self.x == width - 1):
-                locationScore = locationScore - 2
+                locationScore = locationScore - locationWeight
 
             if(self.y == 0 or self.y == height - 1):
-                locationScore = locationScore - 2
+                locationScore = locationScore - locationWeight
 
         else:
             if (space[0] == 0 or space[0] == width - 1):
-                locationScore = locationScore - 2
+                locationScore = locationScore - locationWeight
 
             if (self.y == 0 or self.y == height - 1):
-                locationScore = locationScore - 2
+                locationScore = locationScore - locationWeight
 
         return locationScore
 
@@ -428,8 +429,13 @@ class TestCharacter(CharacterEntity):
     def a_star_heuristic2(self, goal, next, wrld):
         enemyScore = self.getEnemyScore(wrld)
         locationScore = self.getLocationScore(wrld, next)
+        dx = abs(next[0] - goal[0])
+        dy = abs(next[1] - goal[1])
+        D = 1
+        D2 = math.sqrt(2)
+        return (D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)) + enemyScore + locationScore
 
-        return math.sqrt(((goal[0] - next[0]) ** 2) + ((goal[1] - next[1]) ** 2)) + enemyScore + locationScore
+        # return math.sqrt(((goal[0] - next[0]) ** 2) + ((goal[1] - next[1]) ** 2))
 
     # Returns list of all the possible moves for agent (up, down, left, right, diagonal)
     #
