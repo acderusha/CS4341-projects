@@ -12,7 +12,7 @@ import math
 from random import randint
 
 infinity = 1000000
-depth = 4
+depth = 3
 
 class TestCharacter(CharacterEntity):
 
@@ -36,6 +36,8 @@ class TestCharacter(CharacterEntity):
             self.place_bomb()
         else:
             self.move(bestScoreMove[0], bestScoreMove[1])
+
+        print("Best Move:", bestScoreMove)
 
         # Go to the goal state if the path leads to a space next to it. ie Terminal Test
         self.goToGoal(start, goal)
@@ -65,7 +67,7 @@ class TestCharacter(CharacterEntity):
         enemyInRange = True
         for enemy in enemies:
             print(self.enemyDist(wrld, (enemy[0], enemy[1]), start))
-            if (math.sqrt((enemy[0] - start[0]) ** 2 + (enemy[1] - start[1]) ** 2 ) > 4):
+            if (self.enemyDist(wrld, (enemy[0], enemy[1]), start) > 6):
                 enemyInRange = False
 
         if(not enemies or self.enemyDist(wrld, (enemy[0], enemy[1]), start) > self.dist(start, goal)):
@@ -128,11 +130,14 @@ class TestCharacter(CharacterEntity):
                         bestValue = value
                         bestMove = allDirections[index]
 
-                        # Check to see in vlaue changed
+                        # Check to see in value changed
                         if(value != allSame):
                             isAllSame = False
 
                 index += 1
+
+            if(isAllSame and len(explosions) == 0 and len(bombs) == 0):
+                return 'B'
 
         return bestMove
 
@@ -460,8 +465,6 @@ class TestCharacter(CharacterEntity):
     def getAllDirections(self, wrld, currentLocation):
         directionList = []
 
-        # directionList.append((0, 0))
-
         # Look right
         # Avoid out of bound look ups
         if ((currentLocation[0] + 1) < wrld.width()):
@@ -502,6 +505,8 @@ class TestCharacter(CharacterEntity):
         if ((currentLocation[0] - 1) >= 0 and (currentLocation[1] - 1) >= 0):
             if (wrld.empty_at(currentLocation[0] - 1, currentLocation[1] - 1)):
                 directionList.append((-1, -1))
+
+        directionList.append((0, 0))
 
         return directionList
 
@@ -551,6 +556,60 @@ class TestCharacter(CharacterEntity):
 
         return movesList
 
+    # Returns list of all the possible moves for enemy (up, down, left, right, diagonal) including walls
+    #
+    # PARAM: [world, [int, int]] wrld: the current world configuration
+    #        [start.x, start.y] currentLocation: the x and y coordinated the agent is located at
+    # RETURNS: [list [int, int]] allMoves: a list of all the possible moves for agent
+    #
+    def getAllEnemyMoves(self, wrld, currentLocation):
+        movesList = []
+
+        movesList.append((currentLocation[0], currentLocation[1]))
+
+        # Look right
+        # Avoid out of bound look ups
+        if ((currentLocation[0] + 1) < wrld.width()):
+            if (wrld.empty_at(currentLocation[0] + 1, currentLocation[1]) or wrld.characters_at(currentLocation[0] + 1, currentLocation[1])):
+                movesList.append((currentLocation[0] + 1, currentLocation[1]))
+        # Look left
+        # Avoid out of bound look ups
+        if ((currentLocation[0] - 1) >= 0):
+            if (wrld.empty_at(currentLocation[0] - 1, currentLocation[1]) or wrld.characters_at(currentLocation[0] - 1, currentLocation[1])):
+                movesList.append((currentLocation[0] - 1, currentLocation[1]))
+        # Look down
+        # Avoid out of bound look ups
+        if ((currentLocation[1] - 1) >= 0):
+            if (wrld.empty_at(currentLocation[0], currentLocation[1] - 1) or wrld.characters_at(currentLocation[0], currentLocation[1] - 1)):
+                movesList.append((currentLocation[0], currentLocation[1] - 1))
+        # Look up
+        # Avoid out of bound look ups
+        if ((currentLocation[1] + 1) < wrld.height()):
+            if (wrld.empty_at(currentLocation[0], currentLocation[1] + 1) or wrld.characters_at(currentLocation[0], currentLocation[1] + 1)):
+                movesList.append((currentLocation[0], currentLocation[1] + 1))
+        # Look diagonal right, up
+        # Avoid out of bound look ups
+        if ((currentLocation[0] + 1) < wrld.width() and (currentLocation[1] + 1) < wrld.height()):
+            if (wrld.empty_at(currentLocation[0] + 1, currentLocation[1] + 1) or wrld.characters_at(currentLocation[0] + 1, currentLocation[1] + 1)):
+                movesList.append((currentLocation[0] + 1, currentLocation[1] + 1))
+        # Look diagonal right, down
+        # Avoid out of bound look ups
+        if ((currentLocation[0] + 1) < wrld.width() and (currentLocation[1] - 1) >= 0):
+            if (wrld.empty_at(currentLocation[0] + 1, currentLocation[1] - 1) or wrld.characters_at(currentLocation[0] + 1, currentLocation[1] - 1)):
+                movesList.append((currentLocation[0] + 1, currentLocation[1] - 1))
+        # Look diagonal left, up
+        # Avoid out of bound look ups
+        if ((currentLocation[0] - 1) >= 0 and (currentLocation[1] + 1) < wrld.height()):
+            if (wrld.empty_at(currentLocation[0] - 1, currentLocation[1] + 1) or wrld.characters_at(currentLocation[0] - 1, currentLocation[1] + 1)):
+                movesList.append((currentLocation[0] - 1, currentLocation[1] + 1))
+        # Look diagonal left, down
+        # Avoid out of bound look ups
+        if ((currentLocation[0] - 1) >= 0 and (currentLocation[1] - 1) >= 0):
+            if (wrld.empty_at(currentLocation[0] - 1, currentLocation[1] - 1) or wrld.characters_at(currentLocation[0] - 1, currentLocation[1] - 1)):
+                movesList.append((currentLocation[0] - 1, currentLocation[1] - 1))
+
+        return movesList
+
 
     # Finds the A* path to the goal
     #
@@ -594,6 +653,12 @@ class TestCharacter(CharacterEntity):
     def findEnemyPath(self, start, goal, wrld, a_star_graph):
         path = []
         move = goal
+        # print(a_star_graph)
+
+
+        if (goal not in a_star_graph[0]):
+            return path
+
         while (move != start):
             lastMove = move
             move = a_star_graph[0][lastMove]
@@ -810,6 +875,7 @@ class TestCharacter(CharacterEntity):
     def enemyScore(self, wrld, start, enemies):
         # Max Number of enemies is 2
         maxEnemies = 2
+        enemyWeight = 20
 
         # The lower the number of enemies the better
         enemyExistanceScore = (maxEnemies - len(enemies)) * 100
@@ -817,10 +883,10 @@ class TestCharacter(CharacterEntity):
         # Farther away enemies are the better
         enemyProx = 0
         for enemyLoc in enemies:
-            enemyDis = math.sqrt((enemyLoc[0] - start[0]) ** 2 + (enemyLoc[1] - start[1]) ** 2)
-            if (enemyDis < 6):
-                enemyProx = enemyProx - ((5 - enemyDis) * 20)
-            if(enemyDis <= 3.5):
+            enemyDis = self.enemyDist(wrld,(enemyLoc[0], enemyLoc[1]), start) - 1
+            if (enemyDis <= 4):
+                enemyProx = enemyProx - ((4 - enemyDis) * enemyWeight)
+            if(enemyDis <= 1):
                 enemyProx = infinity / 2
 
         totalEnemyScore = enemyExistanceScore - enemyProx
@@ -915,10 +981,15 @@ class TestCharacter(CharacterEntity):
     # RETRUNS: the number of moves away the enemy is
     #
     def enemyDist(self, wrld, enemyStart, agentStart):
-        # enemyMap = self.enemy_a_star_search(wrld, enemyStart, agentStart)
-        # enemyPath = self.findEnemyPath(enemyStart, agentStart, wrld, enemyMap)
+        path = infinity
+        enemyMap = self.enemy_a_star_search(wrld, enemyStart, agentStart)
+        enemyPath = self.findEnemyPath(enemyStart, agentStart, wrld, enemyMap)
         enemyRawDist = math.sqrt((agentStart[0] - enemyStart[0]) ** 2 + (agentStart[1] - enemyStart[1]) ** 2)
-        return enemyRawDist
+
+        if(enemyPath == []):
+            return infinity
+
+        return len(enemyPath)
 
 
     # Returns a world with the A* path marked
@@ -943,11 +1014,8 @@ class TestCharacter(CharacterEntity):
             if current == goal:
                 break
 
-            for next in self.getAllMoves(wrld, current):
-                if (wrld.wall_at(next[0], next[1])):
-                    new_cost = cost_so_far[current] + infinity  # + graph.cost(current, next)
-                else:  # if there is a wall there
-                    new_cost = cost_so_far[current] + 1
+            for next in self.getAllEnemyMoves(wrld, current):
+                new_cost = cost_so_far[current] + 1
                 if next not in cost_so_far or new_cost < cost_so_far[next]:
                     cost_so_far[next] = new_cost
                     priority = new_cost + self.a_star_heuristic2(goal, next)
