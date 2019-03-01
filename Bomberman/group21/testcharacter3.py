@@ -399,7 +399,7 @@ class TestCharacter(CharacterEntity):
 
             for next in self.getAllMoves(wrld, current):
                 if (wrld.wall_at(next[0], next[1])):
-                    new_cost = cost_so_far[current] + 20 # + graph.cost(current, next)
+                    new_cost = cost_so_far[current] + 2 # + graph.cost(current, next)
                 else: # if there is a wall there
                     new_cost = cost_so_far[current] + 1
                 if next not in cost_so_far or new_cost < cost_so_far[next]:
