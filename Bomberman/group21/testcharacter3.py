@@ -45,15 +45,15 @@ class TestCharacter(CharacterEntity):
                 directionProc = -1
             self.move(0, directionProc)
 
+        if (len(bombs) == 0):
+            startProcedure2 = self.startProcedure2(wrld, start, goal)
+            if(startProcedure2 and len(bombs) == 0 and not startProcedure1):
+                print("Procedure Start 2")
+                self.place_bomb()
 
-        startProcedure2 = self.startProcedure2(wrld, start, goal)
-        if(startProcedure2 and len(bombs) == 0 and not startProcedure1):
-            print("Procedure Start 2")
-            self.place_bomb()
-
-        if(len(bombs) == 1):
-            startProcedure3 = self.startProcedure3(wrld, start, goal, bombs)
-            if (startProcedure3 and not startProcedure1 and startProcedure2):
+        else: #and wrld.bomb_at(start[0], start[1])):
+            startProcedure3 = self.startProcedure2(wrld, start, goal)
+            if (startProcedure3):
                 print("Procedure Start 3")
                 self.move(0, -directionProc)
 
