@@ -14,13 +14,20 @@ from random import randint
 infinity = 1000000
 depth = 3
 
+
+class store():
+
+    trigger1 = False
+    trigger2 = False
+    trigger3 = False
+    startProcedure = False
+    totalEnemies = -1
+
+
 class TestCharacter(CharacterEntity):
 
     def do(self, wrld):
         # Your code here
-
-        # Prints the current position of the character after the character moves
-        print(self.x, self.y)
 
         # Find the start (current position) and goal
         start = (self.x, self.y)
@@ -29,22 +36,47 @@ class TestCharacter(CharacterEntity):
         # Get all possible directions fro agent
         allDirections = self.getAllDirections(wrld, start)
         allSpaces = self.getAllSpaces(wrld, start)
+        self.totalEnemies = len(self.getEnemy(wrld))
 
-        startProcedure = self.startProcedure(wrld, start)
-        print(startProcedure)
+        # Prints the current position of the character after the character moves
+        print(self.x, self.y)
+        thisStore = self.store()
 
+        if(not thisStore.startProcedure):
+            thisStore.startProcedure = self.startProcedure(wrld, start)
+            print(thisStore.startProcedure)
+        if(thisStore.startProcedure):
+            print("Procedure Start")
+            directionProc = 1
+            if(goal[1] < start[1]):
+                directionProc = -1
 
-        # Find the current best move for the agent
-        bestScoreMove = self.scoreMoves(wrld, start, goal, allDirections, allSpaces)
-        if(bestScoreMove == 'B'):
-            self.place_bomb()
+            if(not thisStore.trigger1):
+                self.move(0, directionProc)
+                thisStore.trigger1 = True
+                print("Trigger1 Finished")
+            elif(not thisStore.trigger2 and thisStore.trigger1):
+                self.place_bomb()
+                thisStore.trigger2 = True
+                print("Trigger2 Finished")
+            elif (not thisStore.trigger3 and thisStore.trigger2):
+                self.move(0, -directionProc)
+                thisStore.trigger3 = True
+                print("Trigger3 Finished")
+            thisStore.startProcedure = True
+
         else:
-            self.move(bestScoreMove[0], bestScoreMove[1])
+            # Find the current best move for the agent
+            bestScoreMove = self.scoreMoves(wrld, start, goal, allDirections, allSpaces)
+            if(bestScoreMove == 'B'):
+                self.place_bomb()
+            else:
+                self.move(bestScoreMove[0], bestScoreMove[1])
 
-        print("Best Move:", bestScoreMove)
+            print("Best Move:", bestScoreMove)
 
-        # Go to the goal state if the path leads to a space next to it. ie Terminal Test
-        self.goToGoal(start, goal)
+            # Go to the goal state if the path leads to a space next to it. ie Terminal Test
+            self.goToGoal(start, goal)
 
         pass
 
@@ -60,23 +92,23 @@ class TestCharacter(CharacterEntity):
     def startProcedure(self, wrld, start):
         enemies = self.getEnemy(wrld)
 
-        if(len(enemies) == 0):
-            return False
+        # if(len(enemies) == 0):
+        #     return False
+        #
+        # else:
+        if(start[0] == 0 and wrld.wall_at(start[0] + 1, start[1])):
+            return True
 
-        else:
-            if(start[0] == 0 and wrld.wall_at(start[0] + 1, start[1])):
+        if(start[0] == wrld.width() - 1 and wrld.wall_at(start[0] - 1, start[1])):
+            return True
+
+        # Between Walls
+        if(start[0] != 0 and start[0] != wrld.width() - 1):
+            if(wrld.wall_at(start[0] - 1, start[1]) and wrld.wall_at(start[0] + 1, start[1])):
                 return True
-
-            if(start[0] == wrld.width() - 1 and wrld.wall_at(start[0] - 1, start[1])):
+        if (start[1] != 0 and start[1] != wrld.height() - 1):
+            if(wrld.wall_at(start[0], start[1] + 1) and wrld.wall_at(start[0], start[1] - 1)):
                 return True
-
-            # Between Walls
-            if(start[0] != 0 and start[0] != wrld.width() - 1):
-                if(wrld.wall_at(start[0] - 1, start[1]) and wrld.wall_at(start[0] + 1, start[1])):
-                    return True
-            if (start[1] != 0 and start[1] != wrld.height() - 1):
-                if(wrld.wall_at(start[0], start[1] + 1) and wrld.wall_at(start[0], start[1] - 1)):
-                    return True
 
         return False
 
