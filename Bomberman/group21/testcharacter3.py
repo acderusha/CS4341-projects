@@ -9,9 +9,10 @@ from colorama import Fore, Back
 from queue import PriorityQueue
 from events import Event
 import math
+from random import randint
 
 infinity = 1000000
-depth = 4
+depth = 5
 
 class TestCharacter(CharacterEntity):
 
@@ -61,13 +62,18 @@ class TestCharacter(CharacterEntity):
         bestMove = (a_star_move[0], a_star_move[1])
 
         # checks if there is an enemy within 2 blocks
-        enemyInRange = False
+        enemyInRange = True
         for enemy in enemies:
-            if (math.sqrt((enemy[0] - start[0]) ** 2 +  (enemy[1] - start[1]) ** 2 )<= 4):
-                enemyInRange = True
+            print(self.enemyDist(wrld, (enemy[0], enemy[1]), start))
+            if (math.sqrt((enemy[0] - start[0]) ** 2 + (enemy[1] - start[1]) ** 2 ) > 4):
+                enemyInRange = False
+
+        if(not enemies or self.enemyDist(wrld, (enemy[0], enemy[1]), start) > self.dist(start, goal) or
+                (self.enemyDist(wrld, (enemy[0], enemy[1]), start) > 3 and (enemy[0] >= start[0] or enemy[1] >= start[1]))):
+            enemyInRange = False
 
         print(bombs)
-        if (not enemyInRange) and (len(bombs) == 0):
+        if ((not enemyInRange) and (len(bombs) == 0)):
             # if there are no bombs, don't worry about avoiding them
             # if len(bombs) == 0:
             if (wrld.wall_at(start[0]+a_star_move[0], start[1]+a_star_move[1]) and len(explosions) == 0):
@@ -352,7 +358,7 @@ class TestCharacter(CharacterEntity):
 
             for next in self.getAllMoves(wrld, current):
                 if (wrld.wall_at(next[0], next[1])):
-                    new_cost = cost_so_far[current] + 20 # + graph.cost(current, next)
+                    new_cost = cost_so_far[current] + 3 # + graph.cost(current, next)
                 else: # if there is a wall there
                     new_cost = cost_so_far[current] + 1
                 if next not in cost_so_far or new_cost < cost_so_far[next]:
@@ -443,6 +449,8 @@ class TestCharacter(CharacterEntity):
     def getAllDirections(self, wrld, currentLocation):
         directionList = []
 
+        # directionList.append((0, 0))
+
         # Look right
         # Avoid out of bound look ups
         if ((currentLocation[0] + 1) < wrld.width()):
@@ -494,6 +502,8 @@ class TestCharacter(CharacterEntity):
     #
     def getAllMoves(self, wrld, currentLocation):
         movesList = []
+
+        movesList.append((currentLocation[0], currentLocation[1]))
 
         # Look right
         # Avoid out of bound look ups
@@ -562,6 +572,23 @@ class TestCharacter(CharacterEntity):
             #         path.append(lastMove)
 
         return lastMove
+
+    # Finds the A* path to the agent from enemy
+    #
+    # PARAM: [start.x, start.y] currentLocation: the x and y coordinated the agent is located at
+    #        [world] wrld: the current world configuration
+    #        [world] a_star_grpah: a graph representing the a_star path fro the agent
+    # RETURNS: [list [int, int]] path: a list of the path to the goal
+    #
+    def findEnemyPath(self, start, goal, wrld, a_star_graph):
+        path = []
+        move = goal
+        while (move != start):
+            lastMove = move
+            move = a_star_graph[0][lastMove]
+            path.append(lastMove)
+
+        return path
 
 
     # Returns the move recommended by a*
@@ -749,12 +776,15 @@ class TestCharacter(CharacterEntity):
         a_star_score = self.dist(start, goal)
 
         # Get enemy heuristic
-        enemyScore = self.enemyScore(start, enemies)
+        enemyScore = self.enemyScore(wrld, start, enemies)
 
         # Get Bomb about to explode heuristic
         bombScore = self.bombScore(start, explosions)
 
-        totalScore = a_star_score + enemyScore + bombScore
+        # In Goal heuristic
+        goalScore = self.goalScore(start, goal)
+
+        totalScore = a_star_score + enemyScore + bombScore + goalScore
         return totalScore
 
 
@@ -766,24 +796,24 @@ class TestCharacter(CharacterEntity):
     #
     # RETRUNS: a score based on the proximity of enemies
     #
-    def enemyScore(self, start, enemies):
+    def enemyScore(self, wrld, start, enemies):
         # Max Number of enemies is 2
         maxEnemies = 2
 
         # The lower the number of enemies the better
-        enemyExistanceScore = (maxEnemies - len(enemies)) * 10
+        enemyExistanceScore = (maxEnemies - len(enemies)) * 100
 
         # Farther away enemies are the better
         enemyProx = 0
         for enemyLoc in enemies:
             enemyDis = math.sqrt((enemyLoc[0] - start[0]) ** 2 + (enemyLoc[1] - start[1]) ** 2)
             if (enemyDis < 4):
-                enemyProx = enemyProx - ((4 - enemyDis) * 6)
-            if(enemyDis < 3):
-                enemyProx = -infinity
+                enemyProx = enemyProx - ((5 - enemyDis) * 50)
+            if(enemyDis < 2):
+                enemyProx = infinity / 2
 
-        totalEnemyScore = enemyExistanceScore + enemyProx
-        return -totalEnemyScore
+        totalEnemyScore = enemyExistanceScore - enemyProx
+        return totalEnemyScore
 
 
 
@@ -805,6 +835,20 @@ class TestCharacter(CharacterEntity):
 
         return -bombScore
 
+    # Gets the goal score of the current state
+    #
+    # PARAM: [start.x, start.y]: start: the x and y coordinated the agent is located at
+    #        [list(x, y)] explosions: list of explosions
+    #
+    # RETRUNS: a score based on the proximity of explosion
+    #
+    def goalScore(self, start, goal):
+        gScore = 0
+
+        if(start[0] == goal[0] and start[1] == goal[1]):
+            gScore = infinity
+
+        return gScore
 
     # Gets the next board state
     #
@@ -819,29 +863,54 @@ class TestCharacter(CharacterEntity):
 
         # Move the agent
         if(action != 'B'):
+            # print(agentSim)
             agentSim.move(action[0], action[1])
         else:
             agentSim.place_bomb()
 
-        # Move the monsters
-        # Get direction leading to agent
         if(len(self.getEnemy(wrld)) > 0):
             monsterSim = next(iter(wrld.monsters.values()))[0]
-            monsterX = 0
-            monsterY = 0
-            if(monsterSim.x > agentSim.x):
-                monsterX = -1
-            elif (monsterSim.x < agentSim.x):
-                monsterX = 1
-            if (monsterSim.y > agentSim.y):
-                monsterY = -1
-            elif (monsterSim.y < agentSim.y):
-                monsterY = 1
-            monsterSim.move(monsterX, monsterY)
+
+            # Get all the directions for monster AI
+            enemyDir = self.getAllDirections(wrld, (monsterSim.x, monsterSim.y))
+
+            # If monster in range, makes optimal move
+            if (self.enemyDist(wrld, (monsterSim.x, monsterSim.y), start) > 4):
+                monsterX = 0
+                monsterY = 0
+                if(monsterSim.x > agentSim.x):
+                    monsterX = -1
+                elif (monsterSim.x < agentSim.x):
+                    monsterX = 1
+                if (monsterSim.y > agentSim.y):
+                    monsterY = -1
+                elif (monsterSim.y < agentSim.y):
+                    monsterY = 1
+                monsterSim.move(monsterX, monsterY)
+
+            else:
+                randomInt = randint(0, len(enemyDir)-1)
+                monsterSim.move(enemyDir[randomInt][0], enemyDir[randomInt][1])
 
         newSensedWrld = wrld.next()
 
         return newSensedWrld
+
+
+    # Gets the number of moves away the enemy is to you
+    #
+    # PARAM: [world, [int, int], (int, int)]: wrld: the current state of the world
+    #        [int, int]: enemyStart: the location of the enemy
+    #        [int, int]: agentStart: the location of the agent
+    #
+    # RETRUNS: the number of moves away the enemy is
+    #
+    def enemyDist(self, wrld, enemyStart, agentStart):
+        enemyMap = self.a_star_search(wrld, enemyStart, agentStart)
+        enemyPath = self.findEnemyPath(enemyStart, agentStart, wrld, enemyMap)
+        enemyRawDist = math.sqrt((agentStart[0] - enemyStart[0]) ** 2 + (agentStart[1] - enemyStart[1]) ** 2)
+        return (enemyRawDist + len(enemyPath)) / 2
+
 
 
 
