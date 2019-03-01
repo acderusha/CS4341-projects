@@ -600,8 +600,8 @@ class TestCharacter(CharacterEntity):
         # replace this with reading from a file after the first run
         w = self.getW()
         f = self.getF()
-        for feat in f:
-            print(feat(wrld, (0,1)))
+        # for feat in f:
+            # print(feat(wrld, (0,1)))
 
         if len(w) != len(f):
             print("YOUR CODE IS BROKE")
@@ -765,7 +765,7 @@ class TestCharacter(CharacterEntity):
     # Returns 1/(1 + distance to closest monster)
     # if there are no monsters, just makes the distance monstrous
     def distToCloseMonster(self, s, a):
-        print("START")
+        # print("START")
         me = s.me(self)
         monsters = self.getEnemy(s)
         monsterYs = [m[1] for m in monsters]
@@ -776,18 +776,18 @@ class TestCharacter(CharacterEntity):
             for x in range(s.width()):
                 # if s.monsters_at(x, y) is not None and len(s.monsters_at(x, y)) > 0:
                 if y in monsterYs:
-                    print("MONSTERS FOUND")
+                    # print("MONSTERS FOUND")
                     monsterFound = True
                     break
                 if not s.wall_at(x, y):
-                    print("NOT BLOCKED OFF")
+                    # print("NOT BLOCKED OFF")
                     blockedOff = False
                     break
 
             if monsterFound:
                 break
             if blockedOff:
-                print("BLOCKED OFF")
+                # print("BLOCKED OFF")
                 return 1
 
         closestDist = 9999999
