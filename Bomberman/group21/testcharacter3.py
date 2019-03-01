@@ -30,6 +30,10 @@ class TestCharacter(CharacterEntity):
         allDirections = self.getAllDirections(wrld, start)
         allSpaces = self.getAllSpaces(wrld, start)
 
+        startProcedure = self.startProcedure(wrld, start)
+        print(startProcedure)
+
+
         # Find the current best move for the agent
         bestScoreMove = self.scoreMoves(wrld, start, goal, allDirections, allSpaces)
         if(bestScoreMove == 'B'):
@@ -43,6 +47,41 @@ class TestCharacter(CharacterEntity):
         self.goToGoal(start, goal)
 
         pass
+
+
+
+    # Determines if the stored procedure(place bomb under whole) should commence
+    #
+    # PARAM: [ world, [int, int], (int, int)]: wrld: the current state of the world
+    #        [start.x, start.y]: the x and y coordinated the agent is located at
+    #
+    # RETURNS: [boolean] startProc: boolean determining to start the procedure
+    #
+    def startProcedure(self, wrld, start):
+        enemies = self.getEnemy(wrld)
+
+        if(len(enemies) == 0):
+            return False
+
+        else:
+            if(start[0] == 0 and wrld.wall_at(start[0] + 1, start[1])):
+                return True
+
+            if(start[0] == wrld.width() - 1 and wrld.wall_at(start[0] - 1, start[1])):
+                return True
+
+            # Between Walls
+            if(start[0] != 0 and start[0] != wrld.width() - 1):
+                if(wrld.wall_at(start[0] - 1, start[1]) and wrld.wall_at(start[0] + 1, start[1])):
+                    return True
+            if (start[1] != 0 and start[1] != wrld.height() - 1):
+                if(wrld.wall_at(start[0], start[1] + 1) and wrld.wall_at(start[0], start[1] - 1)):
+                    return True
+
+        return False
+
+
+
 
     # Chooses the best direction to go in based on heuristics
     #
@@ -117,6 +156,10 @@ class TestCharacter(CharacterEntity):
             allSame = 0
             isAllSame = True
             for action in allDirections:
+                # Terminal Test
+
+
+
                 value = self.maximize(start, goal, action, wrld, depth, -infinity, infinity)
                 print(action, value)
 
@@ -140,62 +183,6 @@ class TestCharacter(CharacterEntity):
                 return 'B'
 
         return bestMove
-
-
-
-        # if there is a bomb, ignore a* and just stay alive. also don't put another bomb down
-        # else:
-        #
-        #     highestScore = -1
-        #     for space in allSpaces:
-        #         print("****************************")
-        #         print(space)
-        #         livingScore = abs(wrld.time)
-        #
-        #         # try not to walk onto a bomb
-        #         bombScore = 0
-        #         onBomb = False
-        #         for bombLoc in bombs:
-        #             if (space[0] == bombLoc[0] and space[1] == bombLoc[1]):
-        #                 print("bomb at", bombLoc)
-        #                 bombScore += -10
-        #
-        #             if (start[0] == bombLoc[0] and start[1] == bombLoc[1]):
-        #                 onBomb = True
-        #
-        #         # try not to walk onto an explosion
-        #         explosionScore = 0
-        #         for explosionLoc in explosions:
-        #             if (space[0] == explosionLoc[0] and space[1] == explosionLoc[1]):
-        #                 explosionScore += -5
-        #
-        #         # unless you are standing on a bomb, try not to walk into a space that is going to get exploded
-        #         for futureExplosionLoc in futureExplosions:
-        #             if (space[0] == futureExplosionLoc[0] and space[1] == futureExplosionLoc[1]) and not onBomb:
-        #                 explosionScore += -5
-        #
-        #         enemyScore = 0
-        #         for enemyLoc in enemies:
-        #             futureX = space[0]
-        #             futureY = space[1]
-        #
-        #             enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
-        #             if (enemyDis < 4):
-        #                 enemyScore = enemyScore - ((4 - enemyDis) * 6)
-        #
-        #         a_star_score = 0
-        #         # if(a_star_move == allDirections[i]):
-        #         if (start[0] + a_star_move[0] == space[0]) and (start[1] + a_star_move[1] == space[1]):
-        #             a_star_score = 5
-        #
-        #         totalScore = livingScore + a_star_score + bombScore + explosionScore + enemyScore
-        #         print(space[0] - start[0], space[1] - start[1], totalScore)
-        #         if (totalScore > highestScore):
-        #             highestScore = totalScore
-        #             bestMove = (space[0] - start[0], space[1] - start[1])
-        #
-        # return bestMove
-
 
     # Gets the locations of the enemies location
     #
@@ -875,7 +862,7 @@ class TestCharacter(CharacterEntity):
     def enemyScore(self, wrld, start, enemies):
         # Max Number of enemies is 2
         maxEnemies = 2
-        enemyWeight = 20
+        enemyWeight = 50
 
         # The lower the number of enemies the better
         enemyExistanceScore = (maxEnemies - len(enemies)) * 100
@@ -886,7 +873,7 @@ class TestCharacter(CharacterEntity):
             enemyDis = self.enemyDist(wrld,(enemyLoc[0], enemyLoc[1]), start) - 1
             if (enemyDis <= 4):
                 enemyProx = enemyProx - ((4 - enemyDis) * enemyWeight)
-            if(enemyDis <= 1):
+            if(enemyDis <= 2):
                 enemyProx = infinity / 2
 
         totalEnemyScore = enemyExistanceScore - enemyProx
