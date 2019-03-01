@@ -15,15 +15,6 @@ infinity = 1000000
 depth = 3
 
 
-class store():
-
-    trigger1 = False
-    trigger2 = False
-    trigger3 = False
-    startProcedure = False
-    totalEnemies = -1
-
-
 class TestCharacter(CharacterEntity):
 
     def do(self, wrld):
@@ -36,36 +27,37 @@ class TestCharacter(CharacterEntity):
         # Get all possible directions fro agent
         allDirections = self.getAllDirections(wrld, start)
         allSpaces = self.getAllSpaces(wrld, start)
+        bombs = self.getBomb(wrld)
         self.totalEnemies = len(self.getEnemy(wrld))
+
+        startProcedure1 = False
+        startProcedure2 = False
+        startProcedure3 = False
 
         # Prints the current position of the character after the character moves
         print(self.x, self.y)
-        thisStore = self.store()
 
-        if(not thisStore.startProcedure):
-            thisStore.startProcedure = self.startProcedure(wrld, start)
-            print(thisStore.startProcedure)
-        if(thisStore.startProcedure):
+        startProcedure1 = self.startProcedure(wrld, start)
+        if(startProcedure1 and len(bombs) == 0):
             print("Procedure Start")
             directionProc = 1
             if(goal[1] < start[1]):
                 directionProc = -1
+            self.move(0, directionProc)
 
-            if(not thisStore.trigger1):
-                self.move(0, directionProc)
-                thisStore.trigger1 = True
-                print("Trigger1 Finished")
-            elif(not thisStore.trigger2 and thisStore.trigger1):
-                self.place_bomb()
-                thisStore.trigger2 = True
-                print("Trigger2 Finished")
-            elif (not thisStore.trigger3 and thisStore.trigger2):
+
+        startProcedure2 = self.startProcedure2(wrld, start, goal)
+        if(startProcedure2 and len(bombs) == 0 and not startProcedure1):
+            print("Procedure Start 2")
+            self.place_bomb()
+
+        if(len(bombs) == 1):
+            startProcedure3 = self.startProcedure3(wrld, start, goal, bombs)
+            if (startProcedure3 and not startProcedure1 and startProcedure2):
+                print("Procedure Start 3")
                 self.move(0, -directionProc)
-                thisStore.trigger3 = True
-                print("Trigger3 Finished")
-            thisStore.startProcedure = True
 
-        else:
+        if(not startProcedure1 and not startProcedure2 and not startProcedure3):
             # Find the current best move for the agent
             bestScoreMove = self.scoreMoves(wrld, start, goal, allDirections, allSpaces)
             if(bestScoreMove == 'B'):
@@ -112,6 +104,95 @@ class TestCharacter(CharacterEntity):
 
         return False
 
+    # Determines if the stored procedure(place bomb under whole) part 2 should commence
+    #
+    # PARAM: [ world, [int, int], (int, int)]: wrld: the current state of the world
+    #        [start.x, start.y]: the x and y coordinated the agent is located at
+    #
+    # RETURNS: [boolean] startProc: boolean determining to start the procedure
+    #
+    def startProcedure2(self, wrld, start, goal):
+        enemies = self.getEnemy(wrld)
+
+        directionProcX = 1
+        directionProcY = 1
+        if (goal[0] < start[0]):
+            directionProcX = -1
+        if (goal[1] < start[1]):
+            directionProcY = -1
+
+        # if(len(enemies) == 0):
+        #     return False
+        #
+        # else:
+        if(start[0] == 0 ):
+            if (wrld.wall_at(start[0] + 1, start[1] + directionProcY) and wrld.empty_at(start[0], start[1] + directionProcY)):
+                return True
+
+            if (wrld.wall_at(start[0] + directionProcX, start[1] + 1) and wrld.wall_at(start[0] + directionProcX, start[1] - 1) and wrld.empty_at(start[0] + directionProcX, start[1])):
+                return True
+
+        if(start[0] == wrld.width()):
+            if (wrld.wall_at(start[0] - 1, start[1] + directionProcY) and wrld.empty_at(start[0], start[1] + directionProcY)):
+                return True
+
+            if (start[1] != 0 and start[1] != wrld.height() - 1):
+                if (wrld.wall_at(start[0] + directionProcX, start[1] + 1) and wrld.wall_at(start[0] + directionProcX, start[1] - 1) and wrld.empty_at(start[0] + directionProcX, start[1])):
+                    return True
+
+
+        # Between Walls
+        if (start[0] != 0 and start[0] != wrld.width()):
+            if (wrld.wall_at(start[0] - 1, start[1] - directionProcY) and wrld.wall_at(start[0] + 1, start[1] - directionProcY) and wrld.empty_at(start[0], start[1] - directionProcY)):
+                return True
+
+        return False
+
+
+    # Determines if the stored procedure(place bomb under whole) part 3 should commence
+    #
+    # PARAM: [ world, [int, int], (int, int)]: wrld: the current state of the world
+    #        [start.x, start.y]: the x and y coordinated the agent is located at
+    #
+    # RETURNS: [boolean] startProc: boolean determining to start the procedure
+    #
+    def startProcedure3(self, wrld, start, goal, bombs):
+        enemies = self.getEnemy(wrld)
+        bombLoc = bombs[0]
+
+        directionProcX = 1
+        directionProcY = 1
+        if (goal[0] < start[0]):
+            directionProcX = -1
+        if (goal[1] < start[1]):
+            directionProcY = -1
+
+        # if(len(enemies) == 0):
+        #     return False
+        #
+        # else:
+        if(start[0] == 0):
+            if (wrld.wall_at(start[0] + 1, start[1] + directionProcY) and wrld.empty_at(start[0], start[1] + directionProcY) and bombs[0][0] == start[0] and bombs[0][1] == start[1]):
+                return True
+
+            if (wrld.wall_at(start[0] + directionProcX, start[1] + 1) and wrld.wall_at(start[0] + directionProcX, start[1] - 1) and wrld.empty_at(start[0] + directionProcX, start[1]) and bombs[0][0] == start[0] and bombs[0][1] == start[1]):
+                return True
+
+        if(start[0] == wrld.width()):
+            if (wrld.wall_at(start[0] - 1, start[1] + directionProcY) and wrld.empty_at(start[0], start[1] + directionProcY) and bombs[0][0] == start[0] and bombs[0][1] == start[1]):
+                return True
+
+            if (start[1] != 0 and start[1] != wrld.height() - 1):
+                if (wrld.wall_at(start[0] + directionProcX, start[1] + 1) and wrld.wall_at(start[0] + directionProcX, start[1] - 1) and wrld.empty_at(start[0] + directionProcX, start[1]) and bombs[0][0] == start[0] and bombs[0][1] == start[1]):
+                    return True
+
+
+        # Between Walls
+        if (start[0] != 0 and start[0] != wrld.width()):
+            if (wrld.wall_at(start[0] - 1, start[1] - directionProcY) and wrld.wall_at(start[0] + 1, start[1] - directionProcY) and wrld.empty_at(start[0], start[1] - directionProcY) and bombLoc[0] == start[0] and bombLoc[1] == start[1] - 1):
+                return True
+
+        return False
 
 
 
