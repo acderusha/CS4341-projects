@@ -12,7 +12,7 @@ import math
 from random import randint
 
 infinity = 1000000
-depth = 5
+depth = 4
 
 class TestCharacter(CharacterEntity):
 
@@ -68,8 +68,7 @@ class TestCharacter(CharacterEntity):
             if (math.sqrt((enemy[0] - start[0]) ** 2 + (enemy[1] - start[1]) ** 2 ) > 4):
                 enemyInRange = False
 
-        if(not enemies or self.enemyDist(wrld, (enemy[0], enemy[1]), start) > self.dist(start, goal) or
-                (self.enemyDist(wrld, (enemy[0], enemy[1]), start) > 3 and (enemy[0] >= start[0] or enemy[1] >= start[1]))):
+        if(not enemies or self.enemyDist(wrld, (enemy[0], enemy[1]), start) > self.dist(start, goal)):
             enemyInRange = False
 
         print(bombs)
@@ -113,11 +112,18 @@ class TestCharacter(CharacterEntity):
             bestMove = -1
             bestValue = -1
             index = 0
+            allSame = 0
+            isAllSame = True
             for action in allDirections:
+                # Terminal Test
+
+
+
                 value = self.maximize(start, goal, action, wrld, depth, -infinity, infinity)
                 print(action, value)
 
                 if (bestMove == -1):
+                    allSame = value
                     bestMove = allDirections[index]
                     bestValue = value
 
@@ -126,7 +132,14 @@ class TestCharacter(CharacterEntity):
                         bestValue = value
                         bestMove = allDirections[index]
 
+                        # Check to see in vlaue changed
+                        if(value != allSame):
+                            isAllSame = False
+
                 index += 1
+
+            if(isAllSame and len(bombs) != 1):
+                return 'B'
 
         return bestMove
 
@@ -358,7 +371,7 @@ class TestCharacter(CharacterEntity):
 
             for next in self.getAllMoves(wrld, current):
                 if (wrld.wall_at(next[0], next[1])):
-                    new_cost = cost_so_far[current] + 3 # + graph.cost(current, next)
+                    new_cost = cost_so_far[current] + 2 # + graph.cost(current, next)
                 else: # if there is a wall there
                     new_cost = cost_so_far[current] + 1
                 if next not in cost_so_far or new_cost < cost_so_far[next]:
@@ -386,7 +399,12 @@ class TestCharacter(CharacterEntity):
     # RETURNS: [int] distance: distance between the current agent location and the goal
     #
     def a_star_heuristic2(self, goal, next):
-        return self.dist(next, goal)
+        dx = abs(next[0] - goal[0])
+        dy = abs(next[1] - goal[1])
+        D = 1
+        D2 = math.sqrt(2)
+        return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
+        # return self.dist(next, goal)
 
     # Returns list of all the possible moves for agent (up, down, left, right, diagonal)
     #
@@ -807,9 +825,9 @@ class TestCharacter(CharacterEntity):
         enemyProx = 0
         for enemyLoc in enemies:
             enemyDis = math.sqrt((enemyLoc[0] - start[0]) ** 2 + (enemyLoc[1] - start[1]) ** 2)
-            if (enemyDis < 4):
-                enemyProx = enemyProx - ((5 - enemyDis) * 50)
-            if(enemyDis < 2):
+            if (enemyDis < 6):
+                enemyProx = enemyProx - ((5 - enemyDis) * 20)
+            if(enemyDis <= 3.5):
                 enemyProx = infinity / 2
 
         totalEnemyScore = enemyExistanceScore - enemyProx
@@ -828,12 +846,10 @@ class TestCharacter(CharacterEntity):
         bombScore = 0
 
         for fire in explosions:
-            if(start[0] == fire[0]):
-                bombScore = bombScore + 20
-            if (start[1] == fire[1]):
-                bombScore = bombScore + 20
+            if(start[0] == fire[0] or start[1] == fire[1]):
+                return -infinity
 
-        return -bombScore
+        return bombScore
 
     # Gets the goal score of the current state
     #
@@ -909,7 +925,7 @@ class TestCharacter(CharacterEntity):
         enemyMap = self.a_star_search(wrld, enemyStart, agentStart)
         enemyPath = self.findEnemyPath(enemyStart, agentStart, wrld, enemyMap)
         enemyRawDist = math.sqrt((agentStart[0] - enemyStart[0]) ** 2 + (agentStart[1] - enemyStart[1]) ** 2)
-        return (enemyRawDist + len(enemyPath)) / 2
+        return len(enemyPath)
 
 
 
