@@ -29,7 +29,11 @@ class TestCharacter(CharacterEntity):
         # Find the current best move for the agent
         bestScoreMove = self.scoreMoves(wrld, start, goal, allDirections, allSpaces)
         if(bestScoreMove == 'B'):
-            self.place_bomb()
+            exploisions = self.getExplosion(wrld)
+            if(len(exploisions) != 0):
+                self.move(0,0)
+            else:
+                self.place_bomb()
         else:
             self.move(bestScoreMove[0], bestScoreMove[1])
 
@@ -48,7 +52,7 @@ class TestCharacter(CharacterEntity):
     # RETRUNS: the best move for the agent
     #
     def scoreMoves(self, wrld, start, goal, allDirections, allSpaces):
-        explosions = self.getExplosion(wrld)
+        bombs = self.getBomb(wrld)
         futureExplosions = self.getFutureExplosions(wrld)
 
         # Gets the move recommended by A*
@@ -57,15 +61,13 @@ class TestCharacter(CharacterEntity):
 
         # if there are no bombs, don't worry about avoiding them
         # if len(bombs) == 0:
-        if (wrld.wall_at(start[0]+a_star_move[0], start[1]+a_star_move[1]) and len(explosions) == 0):
+        if (wrld.wall_at(start[0]+a_star_move[0], start[1]+a_star_move[1]) and len(bombs) == 0):
             bestMove = 'B'
             return bestMove
 
-        highestScore = -1
-
+        highestScore = -infinity
         print(allSpaces)
         for space in allSpaces:
-            print("I GET HERE")
             livingScore = abs(wrld.time)
 
             enemyScore = self.getEnemyScore(wrld, space)
@@ -79,6 +81,12 @@ class TestCharacter(CharacterEntity):
                 a_star_score = 5
 
             totalScore = livingScore + a_star_score + enemyScore + locationScore + explosionScore + bombScore
+            print("livingScore:", livingScore)
+            print("a_star_score:", a_star_score)
+            print("enemyScore:", enemyScore)
+            print("locationScore:", locationScore)
+            print("explosionScore:", explosionScore)
+            print("bombScore:", bombScore)
             print(space[0] - start[0], space[1]-start[1], totalScore)
             if(totalScore > highestScore):
                 highestScore = totalScore
@@ -200,7 +208,7 @@ class TestCharacter(CharacterEntity):
     #
     def getLocationScore(self, wrld, space=False):
         # Being next to an edge offers less mobility
-        locationWeight = 10
+        locationWeight = 1
         locationScore = 0
         width = wrld.width()
         height = wrld.height()
@@ -285,13 +293,12 @@ class TestCharacter(CharacterEntity):
     #
     def getExplosionScore(self, wrld, space):
         explosions = self.getExplosion(wrld)
-        explosionScore = 0
+        explosionScore = 15
         for fire in explosions :
             if(self.x == fire[0] and self.y == fire[1]):
-                print("FIRE")
                 explosionScore = -infinity
 
-        # Go into the future
+        # Go into the future 1
         newState = wrld.next()
         newEvents = newState[1]
         newWrld = newState[0]
@@ -300,7 +307,28 @@ class TestCharacter(CharacterEntity):
         newExplosions = self.getExplosion(newWrld)
         for newFire in newExplosions:
             if (space[0] == newFire[0] and space[1] == newFire[1]):
-                print("MORE FIRE")
+                explosionScore = -infinity
+
+        # Go into the future 2
+        newState2 = newWrld.next()
+        newEvents2 = newState2[1]
+        newWrld2 = newState2[0]
+
+        # Get future fire
+        newExplosions2 = self.getExplosion(newWrld2)
+        for newFire in newExplosions2:
+            if (space[0] == newFire[0] and space[1] == newFire[1]):
+                explosionScore = -infinity
+
+        # Go into the future 3
+        newState3 = newWrld2.next()
+        newEvents3 = newState3[1]
+        newWrld3 = newState3[0]
+
+        # Get future fire
+        newExplosions3 = self.getExplosion(newWrld3)
+        for newFire in newExplosions3:
+            if (space[0] == newFire[0] and space[1] == newFire[1]):
                 explosionScore = -infinity
 
         return explosionScore
