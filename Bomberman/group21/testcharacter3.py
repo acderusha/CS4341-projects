@@ -138,9 +138,6 @@ class TestCharacter(CharacterEntity):
 
                 index += 1
 
-            if(isAllSame and len(bombs) != 1):
-                return 'B'
-
         return bestMove
 
 
@@ -922,10 +919,46 @@ class TestCharacter(CharacterEntity):
     # RETRUNS: the number of moves away the enemy is
     #
     def enemyDist(self, wrld, enemyStart, agentStart):
-        enemyMap = self.a_star_search(wrld, enemyStart, agentStart)
-        enemyPath = self.findEnemyPath(enemyStart, agentStart, wrld, enemyMap)
+        # enemyMap = self.enemy_a_star_search(wrld, enemyStart, agentStart)
+        # enemyPath = self.findEnemyPath(enemyStart, agentStart, wrld, enemyMap)
         enemyRawDist = math.sqrt((agentStart[0] - enemyStart[0]) ** 2 + (agentStart[1] - enemyStart[1]) ** 2)
-        return len(enemyPath)
+        return enemyRawDist
+
+
+    # Returns a world with the A* path marked
+    #
+    # PARAM: [world, [int, int], [int, int]] wrld: the current world configuration
+    #                                       [start.x, start.y]: the x and y coordinated the agent is located at
+    #                                       [goal.x, goal.y]: the x and y coordinated of the goal / exit
+    # RETURNS: [world] newWrld: a grid world marking the A* path to the goal
+    #
+    def enemy_a_star_search(self, wrld, start, goal):
+
+        frontier = PriorityQueue()
+        frontier.put(start, 0)
+        came_from = {}
+        cost_so_far = {}
+        came_from[start] = None
+        cost_so_far[start] = 0
+
+        while not frontier.empty():
+            current = frontier.get()
+
+            if current == goal:
+                break
+
+            for next in self.getAllMoves(wrld, current):
+                if (wrld.wall_at(next[0], next[1])):
+                    new_cost = cost_so_far[current] + infinity  # + graph.cost(current, next)
+                else:  # if there is a wall there
+                    new_cost = cost_so_far[current] + 1
+                if next not in cost_so_far or new_cost < cost_so_far[next]:
+                    cost_so_far[next] = new_cost
+                    priority = new_cost + self.a_star_heuristic2(goal, next)
+                    frontier.put(next, priority)
+                    came_from[next] = current
+
+        return came_from, cost_so_far
 
 
 
