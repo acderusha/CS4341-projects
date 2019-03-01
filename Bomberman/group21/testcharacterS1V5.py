@@ -693,7 +693,7 @@ class TestCharacter(CharacterEntity):
 
             s = newS
 
-        with open('../S2V1weights.txt', 'w+') as out:
+        with open('../S1V3weights.txt', 'w+') as out:
             for weight in w:
                 out.write(str(weight))
                 out.write("\n")
@@ -953,11 +953,11 @@ class TestCharacter(CharacterEntity):
 
 
     def getW(self):
-        if not os.path.isfile('../S2V1weights.txt'):
+        if not os.path.isfile('../S1V5weights.txt'):
             return [-626.4049349551361, -4620.690620596856, -1134.4802240159702,
                     -1572.6866309594548, -624.2853288470031, 1.0, 115.39235469239887]
         w = []
-        with open('../S2V1weights.txt', 'r') as fd:
+        with open('../S1V5weights.txt', 'r') as fd:
             for line in fd:
                 w.append(float(line))
 

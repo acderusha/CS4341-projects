@@ -22,6 +22,8 @@ class TestCharacter(CharacterEntity):
         # self.learn(wrld)
         w = self.getW()
         f = self.getF()
+        for feat in f:
+            print(feat(wrld, (0,1)))
         a = self.getActions(wrld)
         Q = []
 
@@ -693,7 +695,7 @@ class TestCharacter(CharacterEntity):
 
             s = newS
 
-        with open('../S2V1weights.txt', 'w+') as out:
+        with open('../S2V4weights.txt', 'w+') as out:
             for weight in w:
                 out.write(str(weight))
                 out.write("\n")
@@ -763,8 +765,31 @@ class TestCharacter(CharacterEntity):
     # Returns 1/(1 + distance to closest monster)
     # if there are no monsters, just makes the distance monstrous
     def distToCloseMonster(self, s, a):
+        print("START")
         me = s.me(self)
         monsters = self.getEnemy(s)
+        monsterYs = [m[1] for m in monsters]
+
+        monsterFound = False
+        for y in range(me.y, s.height()):
+            blockedOff = True
+            for x in range(s.width()):
+                # if s.monsters_at(x, y) is not None and len(s.monsters_at(x, y)) > 0:
+                if y in monsterYs:
+                    print("MONSTERS FOUND")
+                    monsterFound = True
+                    break
+                if not s.wall_at(x, y):
+                    print("NOT BLOCKED OFF")
+                    blockedOff = False
+                    break
+
+            if monsterFound:
+                break
+            if blockedOff:
+                print("BLOCKED OFF")
+                return 1
+
         closestDist = 9999999
         below = True
         for m in monsters:
@@ -953,11 +978,11 @@ class TestCharacter(CharacterEntity):
 
 
     def getW(self):
-        if not os.path.isfile('../S2V1weights.txt'):
+        if not os.path.isfile('../S2V4weights.txt'):
             return [-626.4049349551361, -4620.690620596856, -1134.4802240159702,
                     -1572.6866309594548, -624.2853288470031, 1.0, 115.39235469239887]
         w = []
-        with open('../S2V1weights.txt', 'r') as fd:
+        with open('../S2V4weights.txt', 'r') as fd:
             for line in fd:
                 w.append(float(line))
 
