@@ -20,7 +20,7 @@ class TestCharacter(CharacterEntity):
         # Your code here
 
         # Prints the current position of the character after the character moves
-        print(self.x, self.y)
+        # print(self.x, self.y)
 
         # Find the start (current position) and goal
         start = (self.x, self.y)
@@ -37,7 +37,7 @@ class TestCharacter(CharacterEntity):
         else:
             self.move(bestScoreMove[0], bestScoreMove[1])
 
-        print("Best Move:", bestScoreMove)
+        # print("Best Move:", bestScoreMove)
 
         # Go to the goal state if the path leads to a space next to it. ie Terminal Test
         self.goToGoal(start, goal)
@@ -66,14 +66,14 @@ class TestCharacter(CharacterEntity):
         # checks if there is an enemy within 2 blocks
         enemyInRange = True
         for enemy in enemies:
-            print(self.enemyDist(wrld, (enemy[0], enemy[1]), start))
+            # print(self.enemyDist(wrld, (enemy[0], enemy[1]), start))
             if (self.enemyDist(wrld, (enemy[0], enemy[1]), start) > 6):
                 enemyInRange = False
 
         if(not enemies or self.enemyDist(wrld, (enemy[0], enemy[1]), start) > self.dist(start, goal)):
             enemyInRange = False
 
-        print(bombs)
+        # print(bombs)
         if ((not enemyInRange) and (len(bombs) == 0)):
             # if there are no bombs, don't worry about avoiding them
             # if len(bombs) == 0:
@@ -100,13 +100,13 @@ class TestCharacter(CharacterEntity):
                     a_star_score = 5
 
                 totalScore = livingScore + a_star_score + enemyScore
-                print(space[0] - start[0], space[1]-start[1], totalScore)
+                # print(space[0] - start[0], space[1]-start[1], totalScore)
                 if(totalScore > highestScore):
                     highestScore = totalScore
                     bestMove = (space[0] - start[0], space[1]-start[1])
         #
         else: # enemy is in range
-            print("EXECUTING MINIMAX")
+            # print("EXECUTING MINIMAX")
 
             # Consider placing a bomb as an action
             allDirections.append('B')
@@ -118,7 +118,7 @@ class TestCharacter(CharacterEntity):
             isAllSame = True
             for action in allDirections:
                 value = self.maximize(start, goal, action, wrld, depth, -infinity, infinity)
-                print(action, value)
+                # print(action, value)
 
                 if (bestMove == -1):
                     allSame = value
@@ -283,11 +283,11 @@ class TestCharacter(CharacterEntity):
         for y in range(wrld.height()):
             for x in range(wrld.width()):
                 if(wrld.exit_at(x,y)):
-                    print(x,y)
+                    # print(x,y)
                     return (x,y)
 
         # Return impossible exit coordinate to signal no exit found
-        print('No Exit Found')
+        # print('No Exit Found')
         return (-1,-1)
 
     # Returns a world with the A* path marked
@@ -623,7 +623,7 @@ class TestCharacter(CharacterEntity):
     def get_a_star_move(self, wrld, start, goal):
         defaultMove = (0,0)
         a_star_path = self.a_star_search(wrld, start, goal)
-        print("****************************************")
+        # print("****************************************")
         # print(a_star_path[0])
         # print(a_star_path[1])
 
