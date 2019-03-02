@@ -10,7 +10,8 @@ from monsters.selfpreserving_monster import SelfPreservingMonster
 
 # TODO This is your code!
 sys.path.insert(1, '../group21')
-from testcharacterS1V3 import TestCharacter
+from testCharacterAStar import TestCharacter
+
 
 # Create the game
 random.seed() # TODO Change this if you want different random choices
