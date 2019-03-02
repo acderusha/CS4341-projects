@@ -16,7 +16,7 @@ class TestCharacter(CharacterEntity):
         # Your code here
 
         # Prints the current position of the character after the character moves
-        print(self.x, self.y)
+        # print(self.x, self.y)
 
         # Find the start (current position) and goal
         start = (self.x, self.y)
@@ -66,7 +66,7 @@ class TestCharacter(CharacterEntity):
             return bestMove
 
         highestScore = -infinity
-        print(allSpaces)
+        # print(allSpaces)
         for space in allSpaces:
             livingScore = abs(wrld.time)
 
@@ -81,67 +81,16 @@ class TestCharacter(CharacterEntity):
                 a_star_score = 5
 
             totalScore = livingScore + a_star_score + enemyScore + locationScore + explosionScore + bombScore
-            print("livingScore:", livingScore)
-            print("a_star_score:", a_star_score)
-            print("enemyScore:", enemyScore)
-            print("locationScore:", locationScore)
-            print("explosionScore:", explosionScore)
-            print("bombScore:", bombScore)
-            print(space[0] - start[0], space[1]-start[1], totalScore)
+            # print("livingScore:", livingScore)
+            # print("a_star_score:", a_star_score)
+            # print("enemyScore:", enemyScore)
+            # print("locationScore:", locationScore)
+            # print("explosionScore:", explosionScore)
+            # print("bombScore:", bombScore)
+            # print(space[0] - start[0], space[1]-start[1], totalScore)
             if(totalScore > highestScore):
                 highestScore = totalScore
                 bestMove = (space[0] - start[0], space[1]-start[1])
-
-        # if there is a bomb, ignore a* and just stay alive. also don't put another bomb down
-        # else:
-        #
-        #     highestScore = -1
-        #     for space in allSpaces:
-        #         print("****************************")
-        #         print(space)
-        #         livingScore = abs(wrld.time)
-        #
-        #         # try not to walk onto a bomb
-        #         bombScore = 0
-        #         onBomb = False
-        #         for bombLoc in bombs:
-        #             if (space[0] == bombLoc[0] and space[1] == bombLoc[1]):
-        #                 print("bomb at", bombLoc)
-        #                 bombScore += -10
-        #
-        #             if (start[0] == bombLoc[0] and start[1] == bombLoc[1]):
-        #                 onBomb = True
-        #
-        #         # try not to walk onto an explosion
-        #         explosionScore = 0
-        #         for explosionLoc in explosions:
-        #             if (space[0] == explosionLoc[0] and space[1] == explosionLoc[1]):
-        #                 explosionScore += -5
-        #
-        #         # unless you are standing on a bomb, try not to walk into a space that is going to get exploded
-        #         for futureExplosionLoc in futureExplosions:
-        #             if (space[0] == futureExplosionLoc[0] and space[1] == futureExplosionLoc[1]) and not onBomb:
-        #                 explosionScore += -5
-        #
-        #         enemyScore = 0
-        #         # for enemyLoc in enemies:
-        #         #     futureX = space[0]
-        #         #     futureY = space[1]
-        #         #
-        #         #     enemyDis = math.sqrt((enemyLoc[0] - futureX) ** 2 + (enemyLoc[1] - futureY) ** 2)
-        #         #     if (enemyDis < 3):
-        #         #         enemyScore = enemyScore - ((3 - enemyDis) * 6)
-        #
-        #         a_star_score = 0
-        #         # if(a_star_move == allDirections[i]):
-        #         if (start[0] + a_star_move[0] == space[0]) and (start[1] + a_star_move[1] == space[1]):
-        #             a_star_score = 5
-        #
-        #         totalScore = livingScore + a_star_score + bombScore + explosionScore + enemyScore
-        #         print(space[0] - start[0], space[1] - start[1], totalScore)
-        #         if (totalScore > highestScore):
-        #             highestScore = totalScore
-        #             bestMove = (space[0] - start[0], space[1] - start[1])
 
         return bestMove
 
@@ -396,11 +345,11 @@ class TestCharacter(CharacterEntity):
         for y in range(wrld.height()):
             for x in range(wrld.width()):
                 if(wrld.exit_at(x,y)):
-                    print(x,y)
+                    # print(x,y)
                     return (x,y)
 
         # Return impossible exit coordinate to signal no exit found
-        print('No Exit Found')
+        # print('No Exit Found')
         return (-1,-1)
 
     # Returns a world with the A* path marked
@@ -660,7 +609,7 @@ class TestCharacter(CharacterEntity):
     def get_a_star_move(self, wrld, start, goal):
         defaultMove = (0,0)
         a_star_path = self.a_star_search(wrld, start, goal)
-        print("****************************************")
+        # print("****************************************")
         # print(a_star_path[0])
         # print(a_star_path[1])
 
