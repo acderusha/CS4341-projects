@@ -10,15 +10,15 @@ from monsters.selfpreserving_monster import SelfPreservingMonster
 
 # TODO This is your code!
 sys.path.insert(1, '../group21')
-from testCharacterAStar import TestCharacter
+from testcharacterS1V4 import TestCharacter
 
 # Create the game
 random.seed() # TODO Change this if you want different random choices
 g = Game.fromfile('map.txt')
-g.add_monster(SelfPreservingMonster("monster", # name
-                                    "M",       # avatar
-                                    3, 13,     # position
-                                    2          # detection range
+g.add_monster(SelfPreservingMonster("aggressive", # name
+                                    "A",          # avatar
+                                    3, 13,        # position
+                                    2             # detection range
 ))
 
 # TODO Add your character

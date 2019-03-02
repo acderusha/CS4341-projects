@@ -3,9 +3,13 @@ import sys
 sys.path.insert(0, '../bomberman')
 # Import necessary stuff
 from entity import CharacterEntity
+from sensed_world import SensedWorld
+from events import Event
+import os.path
 from colorama import Fore, Back
 # Imports for code implementation
 from queue import PriorityQueue
+import random
 import math
 
 class TestCharacter(CharacterEntity):
@@ -15,24 +19,56 @@ class TestCharacter(CharacterEntity):
 
         # Prints the current position of the character after the character moves
         print(self.x, self.y)
+        # self.learn(wrld)
+        w = self.getW()
+        f = self.getF()
+        a = self.getActions(wrld)
+        Q = []
 
-        # Find the start (current position) and goal
-        start = (self.x, self.y)
-        goal = self.findGoal(wrld)
+        bombs = self.getBomb(wrld)
+        if len(bombs) > 0:
+            print("Removing bomb")
+            if (0, 0) in a:
+                a.remove((0, 0))
+            # for act in a:
+            #     if wrld.wall_at(act[0], act[1]):
+            #         a.remove(act)
+        for act in a:
+            Q.append(self.calculateQ(wrld, w, f, act))
 
-        # Get all possible directions fro agent
-        allDirections = self.getAllDirections(wrld, start)
-        allSpaces = self.getAllSpaces(wrld, start)
-
-        # Find the current best move for the agent
-        bestScoreMove = self.scoreMoves(wrld, start, goal, allDirections, allSpaces)
-        if(bestScoreMove == 'B'):
+        maxQ = -999999
+        maxA = a[0]
+        for i in range(len(Q)):
+            if Q[i] > maxQ:
+                maxQ = Q[i]
+                maxA = a[i]
+        print(a)
+        print(Q)
+        print(maxA)
+        # print(1==self.rowBelowIsAllWalls(wrld, (0,0)))
+        # if (1==self.rowBelowIsAllWalls(wrld, (0,0)) or maxA == (0,0)) and len(self.getBomb(wrld)) == 0:# or wrld.wall_at(maxA[0], maxA[1]):
+        if (maxA == (0,0)):
             self.place_bomb()
         else:
-            self.move(bestScoreMove[0], bestScoreMove[1])
+            self.move(maxA[0], maxA[1])
 
-        # Go to the goal state if the path leads to a space next to it. ie Terminal Test
-        self.goToGoal(start, goal)
+        # # Find the start (current position) and goal
+        # start = (self.x, self.y)
+        # goal = self.findGoal(wrld)
+        #
+        # # Get all possible directions fro agent
+        # allDirections = self.getAllDirections(wrld, start)
+        # allSpaces = self.getAllSpaces(wrld, start)
+        #
+        # # Find the current best move for the agent
+        # bestScoreMove = self.scoreMoves(wrld, start, goal, allDirections, allSpaces)
+        # if(bestScoreMove == 'B'):
+        #     self.place_bomb()
+        # else:
+        #     self.move(bestScoreMove[0], bestScoreMove[1])
+        #
+        # # Go to the goal state if the path leads to a space next to it. ie Terminal Test
+        # self.goToGoal(start, goal)
 
         pass
 
@@ -72,8 +108,8 @@ class TestCharacter(CharacterEntity):
 
             highestScore = -1
             for space in allSpaces:
-                print("****************************")
-                print(space)
+                # print("****************************")
+                # print(space)
                 livingScore = abs(wrld.time)
 
                 enemyScore = 0
@@ -91,7 +127,7 @@ class TestCharacter(CharacterEntity):
                     a_star_score = 5
 
                 totalScore = livingScore + a_star_score + enemyScore
-                print(space[0] - start[0], space[1]-start[1], totalScore)
+                # print(space[0] - start[0], space[1]-start[1], totalScore)
                 if(totalScore > highestScore):
                     highestScore = totalScore
                     bestMove = (space[0] - start[0], space[1]-start[1])
@@ -101,8 +137,8 @@ class TestCharacter(CharacterEntity):
 
             highestScore = -1
             for space in allSpaces:
-                print("****************************")
-                print(space)
+                # print("****************************")
+                # print(space)
                 livingScore = abs(wrld.time)
 
                 # try not to walk onto a bomb
@@ -110,7 +146,7 @@ class TestCharacter(CharacterEntity):
                 onBomb = False
                 for bombLoc in bombs:
                     if (space[0] == bombLoc[0] and space[1] == bombLoc[1]):
-                        print("bomb at", bombLoc)
+                        # print("bomb at", bombLoc)
                         bombScore += -10
 
                     if (start[0] == bombLoc[0] and start[1] == bombLoc[1]):
@@ -142,7 +178,7 @@ class TestCharacter(CharacterEntity):
                     a_star_score = 5
 
                 totalScore = livingScore + a_star_score + bombScore + explosionScore + enemyScore
-                print(space[0] - start[0], space[1] - start[1], totalScore)
+                # print(space[0] - start[0], space[1] - start[1], totalScore)
                 if (totalScore > highestScore):
                     highestScore = totalScore
                     bestMove = (space[0] - start[0], space[1] - start[1])
@@ -264,7 +300,7 @@ class TestCharacter(CharacterEntity):
         for y in range(wrld.height()):
             for x in range(wrld.width()):
                 if(wrld.exit_at(x,y)):
-                    print(x,y)
+                    # print(x,y)
                     return (x,y)
 
         # Return impossible exit coordinate to signal no exit found
@@ -518,9 +554,9 @@ class TestCharacter(CharacterEntity):
     def get_a_star_move(self, wrld, start, goal):
         defaultMove = (0,0)
         a_star_path = self.a_star_search(wrld, start, goal)
-        print("****************************************")
-        print(a_star_path[0])
-        print(a_star_path[1])
+        # print("****************************************")
+        # print(a_star_path[0])
+        # print(a_star_path[1])
 
         direction = self.findPath(start, goal, wrld, a_star_path)
 
@@ -557,3 +593,382 @@ class TestCharacter(CharacterEntity):
             y = 1
 
         return (x, y)
+
+    def learn(self, wrld):
+        # replace this with reading from a file after the first run
+        w = self.getW()
+        f = self.getF()
+        # for feat in f:
+        #     print(feat(wrld, (0,1)))
+
+        if len(w) != len(f):
+            print("YOUR CODE IS BROKE")
+            sys.exit(-1)
+
+        # DISCOUNT FACTOR
+        gamma = 0.9
+
+        # INITIAL LEARNING RATE
+        # will decrease by 0.1 every 2500 iterations
+        alpha = 0.5
+        alphaDecFreq = 1250
+        alphaDecRate = 0.1
+
+
+        # EXPLORATION VS EXPLOITATION FACTOR
+        # will decrease by 0.1 every 1500
+        epsilon = 0.8
+        epsilonDecFreq = 750
+        epsilonDecRate = 0.1
+
+        # Learning will start from this world
+        s = SensedWorld.from_world(wrld)
+
+        done = False
+        for i in range(5000):
+            if i == 100 or i == 200 or i == 300 or i == 400 or i == 500 or i % 1000 == 0:
+                print(i)
+            if i % epsilonDecFreq == 0:
+                epsilon -= epsilonDecRate
+            if i % alphaDecFreq == 0:
+                alpha -= alphaDecRate
+
+            if done:
+                # print("Reset")
+                s = SensedWorld.from_world(wrld)
+                done = False
+
+            me = s.me(self)
+
+            # get actions and calculate Q(s, a)
+            a = self.getActions(s)
+            Q = []
+            for i in range(len(a)):
+                Q.append(0)
+                Q[i] = self.calculateQ(s, w, f, a[i])
+
+            # choose move
+            temp = random.random()
+            if temp < epsilon:
+                act = random.choice(a)
+                choice = a.index(act)
+            else:
+                maxQ = -99999
+                act = a[0]
+                choice = 0
+                for i in range(len(a)):
+                    if Q[i] > maxQ:
+                        maxQ = Q[i]
+                        act = a[i]
+                        choice = i
+
+            # do the moves, progress the world, and get reward
+            for m2 in s.monsters.values():
+                for m in m2:
+                    m.do(s)
+            # print(me.x, me.y, act)
+            if act == (0, 0):
+                me.place_bomb()
+                # print("Bombed")
+            else:
+                me.move(act[0], act[1])
+            newS, events = s.next()
+            r = self.getReward(newS, events)
+
+            # if dead or finished, Q(s', a') == 0
+            if r == 1000 or r < 0:
+                nextQ = 0
+                done = True
+            else:
+                na = self.getActions(newS)
+                nQ = []
+                for i in range(len(na)):
+                    nQ.append(0)
+                    nQ[i] = self.calculateQ(newS, w, f, na[i])
+                nextQ = max(nQ)
+
+            delta = (r + gamma*nextQ) - Q[choice]
+            for i in range(len(w)):
+                w[i] = w[i] + alpha * delta * f[i](s, act)
+
+            s = newS
+
+        with open('../S1V3weights.txt', 'w+') as out:
+            for weight in w:
+                out.write(str(weight))
+                out.write("\n")
+        print("LEARNING IS FINISHED!!!!!!!!!!!!!!!!!!!!!")
+        print(w)
+        sys.exit(1)
+
+    # calculates (Max?) Q value
+    def calculateQ(self, s, w, f, a):
+        qVal = 0
+        for j in range(len(w)):
+            qVal += w[j] * f[j](s, a)
+        return qVal
+
+    # returns the reward for a state, and the events that happened
+    def getReward(self, s, events):
+        score =  0
+        for e in events:
+            if e.tpe == Event.CHARACTER_FOUND_EXIT:
+                # print("Won")
+                return 1000
+                # score = 1000
+                # break
+            elif e.tpe == Event.CHARACTER_KILLED_BY_MONSTER or e.tpe == Event.BOMB_HIT_CHARACTER:
+                # print("Dead")
+                return -1000
+                # score = -10000
+                # break
+            elif e.tpe == Event.BOMB_HIT_MONSTER:
+                score += 100
+            elif e.tpe == Event.BOMB_HIT_WALL:
+                score += 10
+        me = s.me(self)
+        temp = (s.width() + s.height()) - self.a_star_heuristic(self.findGoal(s), (me.x, me.y))
+        score += temp*2
+
+        return score
+
+    # returns a list of all legal actions
+    def getActions(self, s):
+        me = s.me(self)
+        a = []
+        # print("********Getting Actions*******")
+        for x in range(-1, 2):
+            # print(x)
+            for y in range(-1, 2):
+                # print(x, y, x < 0, x >= s.width(), y < 0, y >= s.height(), s.wall_at(x, y))
+                # if x == 0 and y == 0:
+                #     print(me.x+x > 0, me.x+x <= s.width(), me.y+y > 0, me.y+y <= s.height())
+                #     continue
+                if me.x+x >= 0 and me.x+x < s.width() and me.y+y >= 0 and me.y+y < s.height() and not s.wall_at(me.x+x, me.y+y):
+                    a.append((x, y))
+        return a
+
+    # returns number of monsters
+    def numMonsters(self, s, a):
+        me = s.me(self)
+        if a == (0, 0):
+            me.place_bomb()
+        else:
+            # print(a)
+            me.move(a[0], a[1])
+        newS, events = s.next()
+        monsters = self.getEnemy(newS)
+        return len(monsters)
+
+    # Returns 1/(1 + distance to closest monster)
+    # if there are no monsters, just makes the distance monstrous
+    def distToCloseMonster(self, s, a):
+        me = s.me(self)
+        monsters = self.getEnemy(s)
+        closestDist = 9999999
+        below = True
+        for m in monsters:
+            dist = self.a_star_heuristic2((me.x + a[0], me.y + a[1]), m)
+            if dist <= closestDist:
+                closestDist = dist
+
+        return float(1) / (1 + closestDist)
+
+    # returns 1 / (1 + dist to goal)
+    def distToGoal(self, s, a):
+        me = s.me(self)
+        # if a == (0, 0):
+        #     me.place_bomb()
+        # else:
+        #     me.move(a[0], a[1])
+        # newS, events = s.next()
+        # for e in events:
+        #     if e.tpe == Event.BOMB_HIT_CHARACTER or e.tpe == Event.CHARACTER_KILLED_BY_MONSTER:
+        #         return 0
+        # me = newS.me(self)
+        goal = self.findGoal(s)
+        dist = self.a_star_heuristic2((me.x + a[0], me.y + a[1]), goal)
+        return float(1) / (1 + dist)
+
+    # returns 1 for True, 0 for False
+    def charIsOnFutureExplosion(self, s, a):
+        me = s.me(self)
+        # if a == (0, 0):
+        #     me.place_bomb()
+        # else:
+        #     me.move(a[0], a[1])
+        # newS, events = s.next()
+        # me = newS.me(self)
+        # for e in events:
+        #     if e.tpe == Event.BOMB_HIT_CHARACTER or e.tpe == Event.CHARACTER_KILLED_BY_MONSTER:
+        #         return 1
+        futExps = self.getFutureExplosions(s)
+        for fe in futExps:
+            if fe[0] == me.x+a[0] and fe[1] == me.y+a[1]:
+                return 1
+        return 0
+
+    # Returns 1/(1 + distance to closest explosion)
+    # if there are no explosions, just makes the distance monstrous
+    def distToExplosion(self, s, a):
+        me = s.me(self)
+        # if a == (0, 0):
+        #     me.place_bomb()
+        # else:
+        #     me.move(a[0], a[1])
+        # newS, events = s.next()
+        # me = newS.me(self)
+        # for e in events:
+        #     if e.tpe == Event.BOMB_HIT_CHARACTER or e.tpe == Event.CHARACTER_KILLED_BY_MONSTER:
+        #         return 1
+        explosions = self.getExplosion(s)
+        closestDist = 9999999
+        for e in explosions:
+            dist = self.a_star_heuristic2((me.x + a[0], me.y + a[1]), e)
+            if dist <= closestDist:
+                closestDist = dist
+        return float(1) / (1 + closestDist)
+
+    # Returns 1/(1 + distance to bomb)
+    # if there are no bombs, just makes the distance monstrous
+    def distToBomb(self, s, a):
+        me = s.me(self)
+        # if a == (0, 0):
+        #     me.place_bomb()
+        # else:
+        #     me.move(a[0], a[1])
+        # newS, events = s.next()
+        # me = newS.me(self)
+        # for e in events:
+        #     if e.tpe == Event.BOMB_HIT_CHARACTER or e.tpe == Event.CHARACTER_KILLED_BY_MONSTER:
+        #         return 1
+        bomb = self.getBomb(s)
+        closestDist = 9999999
+        for b in bomb:
+            dist = self.a_star_heuristic2((me.x + a[0], me.y + a[1]), b)
+            if dist <= closestDist:
+                closestDist = dist
+        return float(1) / (1 + closestDist)
+
+    # returns 1 if True 0 if False
+    def rowBelowIsAllWalls(self, s, a):
+        me = s.me(self)
+        if me.y + 1 == s.height():
+            # this is an edge case, and bombing here would be pointless, so just say its not true
+            return 0
+
+        for x in range(s.width()):
+            if not s.wall_at(x, me.y + 1):
+                return 0
+        return 1
+
+    # returns 1 if True 0 if False
+    def closestMonsterToRight(self, s, a):
+        me = s.me(self)
+        # if a == (0, 0):
+        #     me.place_bomb()
+        # else:
+        #     me.move(a[0], a[1])
+        # newS, events = s.next()
+        # me = newS.me(self)
+        monsters = self.getEnemy(s)
+
+        if len(monsters) == 0:
+            return False
+        closestDist = 9999999
+        closestMonster = monsters[0]
+        for m in monsters:
+            dist = self.a_star_heuristic2((me.x, me.y), m)
+            if dist <= closestDist:
+                closestDist = dist
+                closestMonster = m
+        if closestMonster[0] > me.x:
+            return 1
+        else:
+            return 0
+
+    # returns 1 if True 0 if False
+    def closestMonsterToLeft(self, s, a):
+        me = s.me(self)
+        # if a == (0, 0):
+        #     me.place_bomb()
+        # else:
+        #     me.move(a[0], a[1])
+        # newS, events = s.next()
+        # me = newS.me(self)
+        monsters = self.getEnemy(s)
+
+        if len(monsters) == 0:
+            return False
+        closestDist = 9999999
+        closestMonster = monsters[0]
+        for m in monsters:
+            dist = self.a_star_heuristic2((me.x, me.y), m)
+            if dist <= closestDist:
+                closestDist = dist
+                closestMonster = m
+        if closestMonster[0] < me.x:
+            return 1
+        else:
+            return 0
+
+    # returns 1 if True 0 if False
+    def closestMonsterInLine(self, s, a):
+        me = s.me(self)
+        monsters = self.getEnemy(s)
+
+        if len(monsters) == 0:
+            return False
+        closestDist = 9999999
+        closestMonster = monsters[0]
+        for m in monsters:
+            dist = self.a_star_heuristic2((me.x, me.y), m)
+            if dist <= closestDist:
+                closestDist = dist
+                closestMonster = m
+        if closestMonster[0] == me.x:
+            return 1
+        else:
+            return 0
+
+    # returns 1 if True 0 if False
+    def moveIsAStar(self, s, a):
+        me = s.me(self)
+        aStarMove = self.get_a_star_move(s, self.findGoal(s), (me.x, me.y))
+        if a[0] == aStarMove[0] and a[1] == aStarMove[1]:
+            return 1
+        else:
+            return 0
+
+    # returns 1 if True 0 if False
+    def putsMonsterInChaseRange(self, s, a):
+        me = s.me(self)
+        monsters = self.getEnemy(s)
+        MONSTER_RANGE = 2
+        for m in monsters:
+            if (m[0] < me.x + a[0] + MONSTER_RANGE and m[0] > me.x + a[0] - MONSTER_RANGE and \
+                m[1] < me.y + a[1] + MONSTER_RANGE and m[1] > me.y + a[1] - MONSTER_RANGE):
+                return 1
+        return 0
+
+
+    def getW(self):
+        if not os.path.isfile('../S1V4weights.txt'):
+            return [-626.4049349551361, -4620.690620596856, -1134.4802240159702,
+                    -1572.6866309594548, -624.2853288470031, 1.0, 115.39235469239887]
+        w = []
+        with open('../S1V4weights.txt', 'r') as fd:
+            for line in fd:
+                w.append(float(line))
+
+        f = self.getF()
+        if len(w) != len(f):
+            print("Using default weights")
+            return [-626.4049349551361, -4620.690620596856, -1134.4802240159702,
+                    -1572.6866309594548, -624.2853288470031, 1.0, 115.39235469239887]
+        else:
+            return w
+
+    def getF(self):
+        return [self.distToCloseMonster, self.distToGoal,
+             self.charIsOnFutureExplosion, self.distToExplosion, self.distToBomb]
